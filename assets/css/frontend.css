@@ -1,0 +1,502 @@
+/* BKM Aksiyon Takip - Frontend Styles */
+
+.bkm-frontend-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    background: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* Login Form Styles */
+.bkm-login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+}
+
+.bkm-login-form {
+    background: #fff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid #e9ecef;
+}
+
+.bkm-login-form h2 {
+    text-align: center;
+    margin-bottom: 10px;
+    color: #2c3e50;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.bkm-login-form p {
+    text-align: center;
+    color: #6c757d;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+.bkm-field {
+    margin-bottom: 20px;
+}
+
+.bkm-field label {
+    display: block;
+    margin-bottom: 8px;
+    color: #495057;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.bkm-field input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    box-sizing: border-box;
+}
+
+.bkm-field input:focus {
+    outline: none;
+    border-color: #007cba;
+    box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.1);
+}
+
+/* Button Styles */
+.bkm-btn {
+    display: inline-block;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    line-height: 1.4;
+}
+
+.bkm-btn-primary {
+    background: #007cba;
+    color: #fff;
+}
+
+.bkm-btn-primary:hover {
+    background: #005a87;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 124, 186, 0.3);
+}
+
+.bkm-btn-secondary {
+    background: #6c757d;
+    color: #fff;
+}
+
+.bkm-btn-secondary:hover {
+    background: #545b62;
+}
+
+.bkm-btn-success {
+    background: #28a745;
+    color: #fff;
+}
+
+.bkm-btn-success:hover {
+    background: #218838;
+}
+
+.bkm-btn-small {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+.bkm-login-form .bkm-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+/* Dashboard Styles */
+.bkm-dashboard {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.bkm-dashboard-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bkm-dashboard-header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.bkm-user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 14px;
+}
+
+.bkm-logout {
+    color: #fff;
+    text-decoration: none;
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 6px;
+    transition: background 0.3s ease;
+}
+
+.bkm-logout:hover {
+    background: rgba(255,255,255,0.3);
+    text-decoration: none;
+    color: #fff;
+}
+
+/* Actions Section */
+.bkm-actions-section {
+    padding: 30px;
+}
+
+.bkm-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.bkm-section-header h2 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+/* Task Form */
+.bkm-task-form {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    border: 1px solid #e9ecef;
+}
+
+.bkm-task-form h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #2c3e50;
+    font-size: 18px;
+}
+
+.bkm-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.bkm-form-grid .bkm-field {
+    margin-bottom: 0;
+}
+
+.bkm-form-grid input,
+.bkm-form-grid select,
+.bkm-form-grid textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.bkm-form-grid textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.bkm-form-actions {
+    display: flex;
+    gap: 10px;
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+}
+
+/* Table Styles */
+.bkm-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    font-size: 14px;
+}
+
+.bkm-table th,
+.bkm-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.bkm-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.bkm-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.bkm-action-desc {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Priority Styles */
+.bkm-priority {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.bkm-priority.priority-1 {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.bkm-priority.priority-2 {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.bkm-priority.priority-3 {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Progress Bar */
+.bkm-progress {
+    position: relative;
+    background: #e9ecef;
+    border-radius: 10px;
+    height: 18px;
+    overflow: hidden;
+    min-width: 80px;
+}
+
+.bkm-progress-bar {
+    background: linear-gradient(90deg, #28a745, #20c997);
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.bkm-progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 11px;
+    font-weight: 600;
+    color: #495057;
+}
+
+/* Status */
+.bkm-status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.bkm-status.status-open {
+    background: #d4edda;
+    color: #155724;
+}
+
+.bkm-status.status-closed {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Tasks Row */
+.bkm-tasks-row td {
+    background: #f8f9fa;
+    border-top: none;
+}
+
+.bkm-tasks-container {
+    padding: 20px;
+}
+
+.bkm-tasks-container h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #2c3e50;
+    font-size: 16px;
+}
+
+.bkm-tasks-list {
+    display: grid;
+    gap: 15px;
+}
+
+.bkm-task-item {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    transition: all 0.3s ease;
+}
+
+.bkm-task-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.bkm-task-item.completed {
+    background: #e8f5e8;
+    border-color: #28a745;
+}
+
+.bkm-task-content {
+    flex: 1;
+}
+
+.bkm-task-content p {
+    margin: 0 0 10px 0;
+    color: #2c3e50;
+}
+
+.bkm-task-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.bkm-task-progress {
+    max-width: 150px;
+}
+
+.bkm-task-actions {
+    margin-left: 15px;
+}
+
+/* Notifications */
+.bkm-success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    padding: 12px 15px;
+    margin: 15px 0;
+    border-radius: 6px;
+    border-left: 4px solid #28a745;
+}
+
+.bkm-error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 12px 15px;
+    margin: 15px 0;
+    border-radius: 6px;
+    border-left: 4px solid #dc3545;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .bkm-frontend-container {
+        padding: 15px;
+    }
+    
+    .bkm-dashboard-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .bkm-actions-section {
+        padding: 20px;
+    }
+    
+    .bkm-section-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    
+    .bkm-form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .bkm-table {
+        font-size: 12px;
+    }
+    
+    .bkm-table th,
+    .bkm-table td {
+        padding: 8px 10px;
+    }
+    
+    .bkm-task-item {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .bkm-task-actions {
+        margin-left: 0;
+        align-self: flex-start;
+    }
+    
+    .bkm-user-info {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .bkm-login-form {
+        padding: 30px 20px;
+    }
+    
+    .bkm-dashboard-header h1 {
+        font-size: 22px;
+    }
+    
+    .bkm-task-meta {
+        flex-direction: column;
+        gap: 5px;
+    }
+}
