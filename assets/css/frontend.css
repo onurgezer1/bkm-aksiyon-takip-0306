@@ -1,4 +1,4 @@
-/* BKM Aksiyon Takip - Frontend Styles */
+/* BKM Aksiyon Takip - Frontend Styles - Güncellenmiş Versiyon */
 
 .bkm-frontend-container {
     max-width: 1200px;
@@ -9,7 +9,9 @@
     min-height: 100vh;
 }
 
-/* Login Form Styles */
+/* ===========================================
+   LOGIN FORM STYLES - GÜVENLİK GÜNCELLEMELİ
+   =========================================== */
 .bkm-login-wrapper {
     display: flex;
     justify-content: center;
@@ -23,8 +25,9 @@
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     width: 100%;
-    max-width: 400px;
+    max-width: 420px;
     border: 1px solid #e9ecef;
+    position: relative;
 }
 
 .bkm-login-form h2 {
@@ -40,10 +43,13 @@
     color: #6c757d;
     margin-bottom: 30px;
     font-size: 14px;
+    line-height: 1.5;
 }
 
+/* FORM FIELD STYLES */
 .bkm-field {
     margin-bottom: 20px;
+    position: relative;
 }
 
 .bkm-field label {
@@ -54,23 +60,137 @@
     font-size: 14px;
 }
 
-.bkm-field input {
+.bkm-field label .required {
+    color: #dc3545;
+    margin-left: 3px;
+    font-weight: 600;
+}
+
+.bkm-field input[type="text"],
+.bkm-field input[type="password"],
+.bkm-field input[type="email"],
+.bkm-field input[type="date"],
+.bkm-field input[type="number"],
+.bkm-field textarea,
+.bkm-field select {
     width: 100%;
     padding: 12px 16px;
     border: 2px solid #e9ecef;
     border-radius: 8px;
     font-size: 16px;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.3s ease;
     box-sizing: border-box;
+    background: #fff;
 }
 
-.bkm-field input:focus {
+.bkm-field input:focus,
+.bkm-field textarea:focus,
+.bkm-field select:focus {
     outline: none;
     border-color: #007cba;
     box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.1);
 }
 
-/* Button Styles */
+/* HATA DURUMU STILLERI */
+.bkm-field input.error,
+.bkm-field textarea.error,
+.bkm-field select.error {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+    background-color: #fff5f5;
+}
+
+.bkm-field-error {
+    display: block;
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 5px;
+    font-weight: 500;
+    min-height: 18px;
+}
+
+/* PASSWORD FIELD WITH TOGGLE */
+.bkm-password-field {
+    position: relative;
+}
+
+.bkm-password-field input {
+    padding-right: 45px;
+}
+
+.bkm-password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6c757d;
+    padding: 5px;
+    font-size: 16px;
+    border-radius: 4px;
+    transition: color 0.3s ease;
+}
+
+.bkm-password-toggle:hover {
+    color: #495057;
+    background-color: #f8f9fa;
+}
+
+/* ICON STYLES */
+.bkm-icon-error::before {
+    content: "⚠";
+    font-size: 16px;
+}
+
+.bkm-icon-success::before {
+    content: "✓";
+    font-size: 16px;
+}
+
+.bkm-icon-eye::before {
+    content: "👁";
+}
+
+.bkm-icon-eye-slash::before {
+    content: "👁‍🗨";
+}
+
+/* ALERT MESSAGES */
+.bkm-error,
+.bkm-success {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.bkm-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-left: 4px solid #dc3545;
+}
+
+.bkm-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    border-left: 4px solid #28a745;
+}
+
+.bkm-error i,
+.bkm-success i {
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+/* BUTTON STYLES */
 .bkm-btn {
     display: inline-block;
     padding: 12px 24px;
@@ -79,10 +199,13 @@
     text-align: center;
     text-decoration: none;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
     line-height: 1.4;
+    position: relative;
+    min-height: 44px;
+    user-select: none;
 }
 
 .bkm-btn-primary {
@@ -90,10 +213,17 @@
     color: #fff;
 }
 
-.bkm-btn-primary:hover {
+.bkm-btn-primary:hover:not(:disabled) {
     background: #005a87;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 124, 186, 0.3);
+}
+
+.bkm-btn-primary:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 .bkm-btn-secondary {
@@ -115,8 +245,9 @@
 }
 
 .bkm-btn-small {
-    padding: 6px 12px;
+    padding: 8px 16px;
     font-size: 12px;
+    min-height: auto;
 }
 
 .bkm-login-form .bkm-btn {
@@ -126,7 +257,50 @@
     margin-top: 10px;
 }
 
-/* Dashboard Styles */
+/* LOADING STATE */
+.btn-loading {
+    display: none;
+}
+
+.bkm-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s ease-in-out infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to { 
+        transform: rotate(360deg); 
+    }
+}
+
+/* LOGIN HELP */
+.bkm-login-help {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+}
+
+.bkm-login-help a {
+    color: #007cba;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.bkm-login-help a:hover {
+    text-decoration: underline;
+}
+
+/* ===========================================
+   DASHBOARD STYLES
+   =========================================== */
 .bkm-dashboard {
     background: #fff;
     border-radius: 12px;
@@ -163,6 +337,7 @@
     background: rgba(255,255,255,0.2);
     border-radius: 6px;
     transition: background 0.3s ease;
+    font-weight: 500;
 }
 
 .bkm-logout:hover {
@@ -171,7 +346,9 @@
     color: #fff;
 }
 
-/* Actions Section */
+/* ===========================================
+   ACTIONS SECTION
+   =========================================== */
 .bkm-actions-section {
     padding: 30px;
 }
@@ -192,7 +369,9 @@
     font-weight: 600;
 }
 
-/* Task Form */
+/* ===========================================
+   TASK FORM
+   =========================================== */
 .bkm-task-form {
     background: #f8f9fa;
     padding: 25px;
@@ -219,20 +398,33 @@
     margin-bottom: 0;
 }
 
-.bkm-form-grid input,
-.bkm-form-grid select,
-.bkm-form-grid textarea {
+.bkm-form-grid .bkm-field input,
+.bkm-form-grid .bkm-field textarea,
+.bkm-form-grid .bkm-field select {
+    background-color: #000000; /* Siyah arka plan */
+    color: #ffffff; /* Beyaz yazı rengi */
+    border: 1px solid #444444; /* Kenarlık rengi */
+    padding: 12px 16px;
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 14px;
     box-sizing: border-box;
 }
 
-.bkm-form-grid textarea {
-    resize: vertical;
-    min-height: 80px;
+.bkm-form-grid .bkm-field input::placeholder,
+.bkm-form-grid .bkm-field textarea::placeholder {
+    color: #cccccc; /* Görünür placeholder rengi */
+}
+
+.bkm-form-grid .bkm-field input:focus,
+.bkm-form-grid .bkm-field textarea:focus,
+.bkm-form-grid .bkm-field select:focus {
+    outline: none;
+    border-color: #0073aa; /* WordPress mavi tonu */
+    box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.1);
+}
+
+.bkm-form-grid .bkm-field select option {
+    background-color: #000000; /* Siyah arka plan */
+    color: #ffffff; /* Beyaz yazı rengi */
 }
 
 .bkm-form-actions {
@@ -240,14 +432,24 @@
     gap: 10px;
     padding-top: 15px;
     border-top: 1px solid #e9ecef;
+    justify-content: flex-start;
 }
 
-/* Table Styles */
+/* ===========================================
+   TABLE STYLES
+   =========================================== */
+.bkm-actions-table {
+    overflow-x: auto;
+}
+
 .bkm-table {
     width: 100%;
     border-collapse: collapse;
     background: #fff;
     font-size: 14px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .bkm-table th,
@@ -262,6 +464,9 @@
     font-weight: 600;
     color: #495057;
     border-bottom: 2px solid #dee2e6;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .bkm-table tbody tr:hover {
@@ -275,7 +480,9 @@
     white-space: nowrap;
 }
 
-/* Priority Styles */
+/* ===========================================
+   PRIORITY STYLES
+   =========================================== */
 .bkm-priority {
     padding: 4px 8px;
     border-radius: 4px;
@@ -283,6 +490,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    white-space: nowrap;
 }
 
 .bkm-priority.priority-1 {
@@ -300,14 +508,16 @@
     color: #721c24;
 }
 
-/* Progress Bar */
+/* ===========================================
+   PROGRESS BAR
+   =========================================== */
 .bkm-progress {
     position: relative;
     background: #e9ecef;
     border-radius: 10px;
-    height: 18px;
+    height: 20px;
     overflow: hidden;
-    min-width: 80px;
+    min-width: 90px;
 }
 
 .bkm-progress-bar {
@@ -315,6 +525,7 @@
     height: 100%;
     border-radius: 10px;
     transition: width 0.3s ease;
+    position: relative;
 }
 
 .bkm-progress-text {
@@ -325,15 +536,20 @@
     font-size: 11px;
     font-weight: 600;
     color: #495057;
+    text-shadow: 0 1px 2px rgba(255,255,255,0.7);
+    z-index: 1;
 }
 
-/* Status */
+/* ===========================================
+   STATUS STYLES
+   =========================================== */
 .bkm-status {
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
+    white-space: nowrap;
 }
 
 .bkm-status.status-open {
@@ -346,14 +562,18 @@
     color: #721c24;
 }
 
-/* Tasks Row */
+/* ===========================================
+   TASKS SECTION
+   =========================================== */
 .bkm-tasks-row td {
     background: #f8f9fa;
     border-top: none;
+    padding: 0;
 }
 
 .bkm-tasks-container {
     padding: 20px;
+    background: #fff;
 }
 
 .bkm-tasks-container h4 {
@@ -361,6 +581,7 @@
     margin-bottom: 15px;
     color: #2c3e50;
     font-size: 16px;
+    font-weight: 600;
 }
 
 .bkm-tasks-list {
@@ -377,15 +598,18 @@
     justify-content: space-between;
     align-items: flex-start;
     transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .bkm-task-item:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-1px);
 }
 
 .bkm-task-item.completed {
     background: #e8f5e8;
     border-color: #28a745;
+    opacity: 0.9;
 }
 
 .bkm-task-content {
@@ -395,6 +619,7 @@
 .bkm-task-content p {
     margin: 0 0 10px 0;
     color: #2c3e50;
+    font-weight: 500;
 }
 
 .bkm-task-meta {
@@ -406,45 +631,47 @@
     color: #6c757d;
 }
 
+.bkm-task-meta span {
+    background: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 500;
+}
+
 .bkm-task-progress {
     max-width: 150px;
+    margin-top: 5px;
 }
 
 .bkm-task-actions {
     margin-left: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
-/* Notifications */
-.bkm-success {
-    background: #d4edda;
-    border: 1px solid #c3e6cb;
-    color: #155724;
-    padding: 12px 15px;
-    margin: 15px 0;
-    border-radius: 6px;
-    border-left: 4px solid #28a745;
-}
-
-.bkm-error {
-    background: #f8d7da;
-    border: 1px solid #f5c6cb;
-    color: #721c24;
-    padding: 12px 15px;
-    margin: 15px 0;
-    border-radius: 6px;
-    border-left: 4px solid #dc3545;
-}
-
-/* Responsive Design */
+/* ===========================================
+   RESPONSIVE DESIGN
+   =========================================== */
 @media (max-width: 768px) {
     .bkm-frontend-container {
         padding: 15px;
+    }
+    
+    .bkm-login-form {
+        padding: 30px;
+        margin: 0 15px;
     }
     
     .bkm-dashboard-header {
         flex-direction: column;
         gap: 15px;
         text-align: center;
+        padding: 25px 20px;
+    }
+    
+    .bkm-dashboard-header h1 {
+        font-size: 24px;
     }
     
     .bkm-actions-section {
@@ -459,6 +686,7 @@
     
     .bkm-form-grid {
         grid-template-columns: 1fr;
+        gap: 15px;
     }
     
     .bkm-table {
@@ -478,25 +706,134 @@
     .bkm-task-actions {
         margin-left: 0;
         align-self: flex-start;
+        flex-direction: row;
     }
     
     .bkm-user-info {
         flex-direction: column;
         gap: 10px;
     }
+    
+    .bkm-action-desc {
+        max-width: none;
+        white-space: normal;
+    }
 }
 
 @media (max-width: 480px) {
     .bkm-login-form {
-        padding: 30px 20px;
+        padding: 10px;
     }
     
     .bkm-dashboard-header h1 {
-        font-size: 22px;
+        font-size: 20px;
     }
     
     .bkm-task-meta {
         flex-direction: column;
         gap: 5px;
+    }
+    
+    .bkm-task-meta span {
+        display: inline-block;
+        margin-right: 5px;
+        margin-bottom: 3px;
+    }
+    
+    .bkm-form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .bkm-btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* ===========================================
+   ACCESSIBILITY IMPROVEMENTS
+   =========================================== */
+.bkm-btn:focus,
+.bkm-field input:focus,
+.bkm-field textarea:focus,
+.bkm-field select:focus {
+    outline: 2px solid #007cba;
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bkm-btn,
+    .bkm-field input,
+    .bkm-task-item,
+    .bkm-progress-bar {
+        transition: none;
+    }
+    
+    .bkm-spinner {
+        animation: none;
+    }
+}
+
+/* ===========================================
+   DARK MODE SUPPORT
+   =========================================== */
+@media (prefers-color-scheme: dark) {
+    .bkm-frontend-container {
+        background: #1a1a1a;
+        color: #fff;
+    }
+    
+    .bkm-login-form,
+    .bkm-dashboard,
+    .bkm-task-item {
+        background: #2d2d2d;
+        border-color: #404040;
+        color: #fff;
+    }
+    
+    .bkm-task-form .bkm-form-grid .bkm-field input,
+    .bkm-task-form .bkm-form-grid .bkm-field textarea,
+    .bkm-task-form .bkm-form-grid .bkm-field select {
+        background: #000000; /* Siyah görev formu için */
+        border-color: #555;
+        color: #fff;
+    }
+    
+    .bkm-table th {
+        background: #444;
+        color: #fff;
+    }
+    
+    .bkm-table tbody tr:hover {
+        background: #404040;
+    }
+    
+    .bkm-task-form {
+        background: #2d2d2d;
+        border-color: #404040;
+    }
+}
+
+/* ===========================================
+   PRINT STYLES
+   =========================================== */
+@media print {
+    .bkm-login-form,
+    .bkm-btn,
+    .bkm-task-actions,
+    .bkm-logout {
+        display: none;
+    }
+    
+    .bkm-dashboard-header {
+        background: none;
+        color: #000;
+        border-bottom: 2px solid #000;
+    }
+    
+    .bkm-table {
+        box-shadow: none;
+        border: 1px solid #000;
     }
 }

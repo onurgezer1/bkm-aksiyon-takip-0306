@@ -3,7 +3,35 @@
  */
 
 jQuery(document).ready(function($) {
-    
+    $('#bkm-task-form form').on('submit', function(e) {
+        var isValid = true;
+        $(this).find('[required]').each(function() {
+            if (!$(this).val()) {
+                $(this).addClass('error');
+                isValid = false;
+            } else {
+                $(this).removeClass('error');
+            }
+        });
+        if (!isValid) {
+            e.preventDefault();
+            alert('Lütfen tüm zorunlu alanları doldurun.');
+        }
+    });
+});
+
+    $('.bkm-login-form').on('submit', function(e) {
+        var username = $('#log').val();
+        var password = $('#pwd').val();
+        
+        if (!username || !password) {
+            e.preventDefault();
+            alert('Lütfen kullanıcı adı ve şifre girin.');
+            return false;
+        }
+    });
+});
+   
     // Initialize date inputs
     $('input[type="date"]').each(function() {
         if (!$(this).val()) {

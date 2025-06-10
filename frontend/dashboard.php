@@ -4,72 +4,18 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Handle login
-$logged_in = false;
-$login_error = '';
-
-if (isset($_POST['bkm_login'])) {
-    $username = sanitize_text_field($_POST['username']);
-    $password = $_POST['password'];
-    
-    $user = wp_authenticate($username, $password);
-    
-    if (!is_wp_error($user)) {
-        wp_set_current_user($user->ID);
-        wp_set_auth_cookie($user->ID);
-        $logged_in = true;
-    } else {
-        $login_error = 'Kullanıcı adı veya şifre hatalı.';
-    }
-}
-
-// Check if user is already logged in
-if (is_user_logged_in()) {
-    $logged_in = true;
+// Check if user is logged in
+if (!is_user_logged_in()) {
+    include BKM_AKSIYON_TAKIP_PLUGIN_DIR . 'frontend/login.php';
+    return;
 }
 
 // Handle logout
 if (isset($_GET['bkm_logout'])) {
     wp_logout();
-    wp_redirect(remove_query_arg('bkm_logout'));
+    global $wp; // Global $wp nesnesini tanımla
+    wp_safe_redirect(home_url(add_query_arg(array(), $wp->request)));
     exit;
-}
-
-if (!$logged_in) {
-    // Show login form
-    ?>
-    <div class="bkm-frontend-container">
-        <div class="bkm-login-wrapper">
-            <div class="bkm-login-form">
-                <h2>BKM Aksiyon Takip Sistemi</h2>
-                <p>Sisteme giriş yapmak için WordPress kullanıcı adı ve şifrenizi kullanın.</p>
-                
-                <?php if ($login_error): ?>
-                    <div class="bkm-error"><?php echo esc_html($login_error); ?></div>
-                <?php endif; ?>
-                
-                <form method="post" action="">
-                    <div class="bkm-field">
-                        <label for="username">Kullanıcı Adı:</label>
-                        <input type="text" name="username" id="username" required />
-                    </div>
-                    
-                    <div class="bkm-field">
-                        <label for="password">Şifre:</label>
-                        <input type="password" name="password" id="password" required />
-                    </div>
-                    
-                    <div class="bkm-field">
-                        <button type="submit" name="bkm_login" class="bkm-btn bkm-btn-primary">
-                            Giriş Yap
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <?php
-    return;
 }
 
 // User is logged in, show dashboard
@@ -122,7 +68,10 @@ if (isset($_POST['task_action']) && wp_verify_nonce($_POST['bkm_frontend_nonce']
             
             $plugin->send_email_notification('task_completed', $notification_data);
             
-            echo '<div class="bkm-success">Görev başarıyla tamamlandı!</div>';
+            // Redirect to prevent form resubmission
+            global $wp;
+            wp_safe_redirect(home_url(add_query_arg(array('success' => 'task_completed'), $wp->request)));
+            exit;
         }
     }
 }
@@ -165,8 +114,24 @@ if (isset($_POST['add_task']) && wp_verify_nonce($_POST['bkm_frontend_nonce'], '
             
             $plugin->send_email_notification('task_created', $notification_data);
             
-            echo '<div class="bkm-success">Görev başarıyla eklendi!</div>';
+            // Redirect to prevent form resubmission
+            global $wp;
+            wp_safe_redirect(home_url(add_query_arg(array('success' => 'task_added'), $wp->request)));
+            exit;
+        } else {
+            echo '<div class="bkm-error">Görev eklenirken bir hata oluştu.</div>';
         }
+    } else {
+        echo '<div class="bkm-error">Lütfen tüm zorunlu alanları doldurun.</div>';
+    }
+}
+
+// Display success messages
+if (isset($_GET['success'])) {
+    if ($_GET['success'] === 'task_completed') {
+        echo '<div class="bkm-success">Görev başarıyla tamamlandı!</div>';
+    } elseif ($_GET['success'] === 'task_added') {
+        echo '<div class="bkm-success">Görev başarıyla eklendi!</div>';
     }
 }
 

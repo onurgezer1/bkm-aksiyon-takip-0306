@@ -3,7 +3,7 @@
  * Plugin Name: BKM AKSİYON TAKİP
  * Plugin URI: https://github.com/anadolubirlik/BKMAksiyonTakip_Claude4
  * Description: WordPress eklentisi ile aksiyon ve görev takip sistemi
- * Version: 1.0.0
+ * Version: 1.0.2
  * Author: Anadolu Birlik
  * Text Domain: bkm-aksiyon-takip
  * Domain Path: /languages
@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('BKM_AKSIYON_TAKIP_VERSION', '1.0.0');
+define('BKM_AKSIYON_TAKIP_VERSION', '1.0.2');
 define('BKM_AKSIYON_TAKIP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('BKM_AKSIYON_TAKIP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('BKM_AKSIYON_TAKIP_PLUGIN_FILE', __FILE__);
@@ -70,7 +70,55 @@ class BKM_Aksiyon_Takip {
         add_action('wp_ajax_bkm_refresh_stats', array($this, 'ajax_refresh_stats'));
         add_action('wp_ajax_bkm_delete_item', array($this, 'ajax_delete_item'));
         add_action('wp_ajax_bkm_update_task_progress', array($this, 'ajax_update_task_progress'));
-        add_action('wp_ajax_nopriv_bkm_frontend_login', array($this, 'ajax_frontend_login'));
+        
+        // Custom login handling
+        add_action('wp_login_failed', array($this, 'handle_login_failed'), 10, 2);
+        add_filter('authenticate', array($this, 'custom_authenticate'), 30, 3);
+    }
+    
+    /**
+     * Get current page URL
+     */
+    private function get_current_page_url() {
+        global $wp;
+        return home_url(add_query_arg(array(), $wp->request));
+    }
+    
+    /**
+     * Handle login failures
+     */
+    public function handle_login_failed($username, $error) {
+        // Redirect back to login page with error message
+        $redirect_url = $this->get_current_page_url();
+        $redirect_url = add_query_arg('login_error', urlencode($error->get_error_message()), $redirect_url);
+        wp_safe_redirect($redirect_url);
+        exit;
+    }
+    
+    /**
+     * Custom authentication
+     */
+    public function custom_authenticate($user, $username, $password) {
+        if (is_wp_error($user)) {
+            return $user;
+        }
+        
+        if (!empty($username) && !empty($password)) {
+            $user = wp_authenticate_username_password(null, $username, $password);
+            if (is_wp_error($user)) {
+                return $user;
+            }
+            
+            // Set auth cookie
+            wp_set_auth_cookie($user->ID, isset($_POST['rememberme']));
+            
+            // Redirect to the current page after successful login
+            $redirect_url = $this->get_current_page_url();
+            wp_safe_redirect($redirect_url);
+            exit;
+        }
+        
+        return $user;
     }
     
     /**
@@ -79,6 +127,31 @@ class BKM_Aksiyon_Takip {
     public function init() {
         // Load text domain for translations
         load_plugin_textdomain('bkm-aksiyon-takip', false, dirname(plugin_basename(__FILE__)) . '/languages');
+        
+        // Handle custom login form submission
+        if (isset($_POST['bkm_login_submit']) && isset($_POST['bkm_nonce']) && wp_verify_nonce($_POST['bkm_nonce'], 'bkm_login_nonce')) {
+            $username = sanitize_text_field($_POST['log']);
+            $password = $_POST['pwd'];
+            $remember = isset($_POST['rememberme']) ? true : false;
+            
+            $user = wp_signon(array(
+                'user_login' => $username,
+                'user_password' => $password,
+                'remember' => $remember
+            ), is_ssl());
+            
+            if (is_wp_error($user)) {
+                // Store error message in transient to display on redirect
+                set_transient('bkm_login_error', $user->get_error_message(), 30);
+                wp_safe_redirect($this->get_current_page_url());
+                exit;
+            } else {
+                wp_set_current_user($user->ID);
+                wp_set_auth_cookie($user->ID, $remember);
+                wp_safe_redirect($this->get_current_page_url());
+                exit;
+            }
+        }
     }
     
     /**
@@ -91,7 +164,7 @@ class BKM_Aksiyon_Takip {
         $this->create_database_tables();
         
         // Create default categories
-        $this->create_default_data();
+        //$this->create_default_data();
         
         // Flush rewrite rules
         flush_rewrite_rules();
@@ -106,19 +179,16 @@ class BKM_Aksiyon_Takip {
     private function check_requirements() {
         global $wp_version;
         
-        // Check WordPress version
         if (version_compare($wp_version, '5.0', '<')) {
             deactivate_plugins(plugin_basename(__FILE__));
             wp_die('Bu eklenti WordPress 5.0 veya üzeri sürüm gerektirir.');
         }
         
-        // Check PHP version
         if (version_compare(PHP_VERSION, '7.4', '<')) {
             deactivate_plugins(plugin_basename(__FILE__));
             wp_die('Bu eklenti PHP 7.4 veya üzeri sürüm gerektirir.');
         }
         
-        // Check if required functions exist
         if (!function_exists('wp_mail')) {
             deactivate_plugins(plugin_basename(__FILE__));
             wp_die('Bu eklenti wp_mail fonksiyonuna ihtiyaç duyar.');
@@ -400,7 +470,11 @@ class BKM_Aksiyon_Takip {
         $atts = shortcode_atts(array(), $atts, 'aksiyon_takipx');
         
         ob_start();
-        include BKM_AKSIYON_TAKIP_PLUGIN_DIR . 'frontend/dashboard.php';
+        if (!is_user_logged_in()) {
+            include BKM_AKSIYON_TAKIP_PLUGIN_DIR . 'frontend/login.php';
+        } else {
+            include BKM_AKSIYON_TAKIP_PLUGIN_DIR . 'frontend/dashboard.php';
+        }
         return ob_get_clean();
     }
     
@@ -570,27 +644,6 @@ class BKM_Aksiyon_Takip {
         } else {
             wp_send_json_error(array('message' => 'Güncelleme başarısız.'));
         }
-    }
-    
-    /**
-     * AJAX: Frontend login
-     */
-    public function ajax_frontend_login() {
-        check_ajax_referer('bkm_frontend_nonce', 'nonce');
-        
-        $username = sanitize_text_field($_POST['username']);
-        $password = $_POST['password'];
-        
-        $user = wp_authenticate($username, $password);
-        
-        if (is_wp_error($user)) {
-            wp_send_json_error(array('message' => 'Kullanıcı adı veya şifre hatalı.'));
-        }
-        
-        wp_set_current_user($user->ID);
-        wp_set_auth_cookie($user->ID);
-        
-        wp_send_json_success(array('message' => 'Giriş başarılı.', 'redirect' => true));
     }
 }
 
