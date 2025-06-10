@@ -204,84 +204,100 @@ class BKM_Aksiyon_Takip {
     }
     
     /**
-     * Create database tables
-     */
-    private function create_database_tables() {
-        global $wpdb;
-        
-        $charset_collate = $wpdb->get_charset_collate();
-        
-        // Actions table
-        $actions_table = $wpdb->prefix . 'bkm_actions';
-        $actions_sql = "CREATE TABLE $actions_table (
-            id mediumint(9) NOT NULL AUTO_INCREMENT,
-            tanımlayan_id bigint(20) UNSIGNED NOT NULL,
-            onem_derecesi tinyint(1) NOT NULL DEFAULT 1,
-            acilma_tarihi date NOT NULL,
-            hafta int(11) NOT NULL,
-            kategori_id mediumint(9) NOT NULL,
-            sorumlu_ids text NOT NULL,
-            tespit_konusu text NOT NULL,
-            aciklama text NOT NULL,
-            hedef_tarih date NOT NULL,
-            kapanma_tarihi date NULL,
-            performans_id mediumint(9) NOT NULL,
-            ilerleme_durumu int(3) NOT NULL DEFAULT 0,
-            notlar text,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (id)
-        ) $charset_collate;";
-        
-        // Categories table
-        $categories_table = $wpdb->prefix . 'bkm_categories';
-        $categories_sql = "CREATE TABLE $categories_table (
-            id mediumint(9) NOT NULL AUTO_INCREMENT,
-            name varchar(255) NOT NULL,
-            description text,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (id)
-        ) $charset_collate;";
-        
-        // Performance table
-        $performance_table = $wpdb->prefix . 'bkm_performance';
-        $performance_sql = "CREATE TABLE $performance_table (
-            id mediumint(9) NOT NULL AUTO_INCREMENT,
-            name varchar(255) NOT NULL,
-            description text,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (id)
-        ) $charset_collate;";
-        
-        // Tasks table
-        $tasks_table = $wpdb->prefix . 'bkm_tasks';
-        $tasks_sql = "CREATE TABLE $tasks_table (
-            id mediumint(9) NOT NULL AUTO_INCREMENT,
-            action_id mediumint(9) NOT NULL,
-            content text NOT NULL,
-            baslangic_tarihi date NOT NULL,
-            sorumlu_id bigint(20) UNSIGNED NOT NULL,
-            hedef_bitis_tarihi date NOT NULL,
-            ilerleme_durumu int(3) NOT NULL DEFAULT 0,
-            gercek_bitis_tarihi datetime NULL,
-            tamamlandi tinyint(1) NOT NULL DEFAULT 0,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (id),
-            KEY action_id (action_id)
-        ) $charset_collate;";
-        
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($actions_sql);
-        dbDelta($categories_sql);
-        dbDelta($performance_sql);
-        dbDelta($tasks_sql);
-        
-        // Update database version
-        update_option('bkm_aksiyon_takip_db_version', BKM_AKSIYON_TAKIP_VERSION);
-    }
+ * Create database tables
+ */
+private function create_database_tables() {
+    global $wpdb;
+    
+    $charset_collate = $wpdb->get_charset_collate();
+    
+    // Actions table
+    $actions_table = $wpdb->prefix . 'bkm_actions';
+    $actions_sql = "CREATE TABLE $actions_table (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        tanımlayan_id bigint(20) UNSIGNED NOT NULL,
+        onem_derecesi tinyint(1) NOT NULL DEFAULT 1,
+        acilma_tarihi date NOT NULL,
+        hafta int(11) NOT NULL,
+        kategori_id mediumint(9) NOT NULL,
+        sorumlu_ids text NOT NULL,
+        tespit_konusu text NOT NULL,
+        aciklama text NOT NULL,
+        hedef_tarih date NOT NULL,
+        kapanma_tarihi date NULL,
+        performans_id mediumint(9) NOT NULL,
+        ilerleme_durumu int(3) NOT NULL DEFAULT 0,
+        notlar text,
+        created_at datetime DEFAULT CURRENT_TIMESTAMP,
+        updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id)
+    ) $charset_collate;";
+    
+    // Categories table
+    $categories_table = $wpdb->prefix . 'bkm_categories';
+    $categories_sql = "CREATE TABLE $categories_table (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        name varchar(255) NOT NULL,
+        description text,
+        created_at datetime DEFAULT CURRENT_TIMESTAMP,
+        updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id)
+    ) $charset_collate;";
+    
+    // Performance table
+    $performance_table = $wpdb->prefix . 'bkm_performance';
+    $performance_sql = "CREATE TABLE $performance_table (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        name varchar(255) NOT NULL,
+        description text,
+        created_at datetime DEFAULT CURRENT_TIMESTAMP,
+        updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id)
+    ) $charset_collate;";
+    
+    // Tasks table
+    $tasks_table = $wpdb->prefix . 'bkm_tasks';
+    $tasks_sql = "CREATE TABLE $tasks_table (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        action_id mediumint(9) NOT NULL,
+        content text NOT NULL,
+        baslangic_tarihi date NOT NULL,
+        sorumlu_id bigint(20) UNSIGNED NOT NULL,
+        hedef_bitis_tarihi date NOT NULL,
+        ilerleme_durumu int(3) NOT NULL DEFAULT 0,
+        gercek_bitis_tarihi datetime NULL,
+        tamamlandi tinyint(1) NOT NULL DEFAULT 0,
+        created_at datetime DEFAULT CURRENT_TIMESTAMP,
+        updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY action_id (action_id)
+    ) $charset_collate;";
+    
+    // Task Notes table
+    $notes_table = $wpdb->prefix . 'bkm_task_notes';
+    $notes_sql = "CREATE TABLE $notes_table (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        task_id mediumint(9) NOT NULL,
+        user_id bigint(20) UNSIGNED NOT NULL,
+        content text NOT NULL,
+        parent_note_id mediumint(9) NULL,
+        created_at datetime DEFAULT CURRENT_TIMESTAMP,
+        updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY task_id (task_id),
+        KEY parent_note_id (parent_note_id)
+    ) $charset_collate;";
+    
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    dbDelta($actions_sql);
+    dbDelta($categories_sql);
+    dbDelta($performance_sql);
+    dbDelta($tasks_sql);
+    dbDelta($notes_sql);
+    
+    // Update database version
+    update_option('bkm_aksiyon_takip_db_version', BKM_AKSIYON_TAKIP_VERSION);
+}
     
     /**
      * Create default data
@@ -479,59 +495,83 @@ class BKM_Aksiyon_Takip {
     }
     
     /**
-     * Send email notification
-     */
-    public function send_email_notification($type, $data) {
-        $admin_email = get_option('admin_email');
-        $site_name = get_bloginfo('name');
-        
-        switch ($type) {
-            case 'action_created':
-                $subject = sprintf('[%s] Yeni Aksiyon Oluşturuldu', $site_name);
-                $message = sprintf(
-                    "Merhaba,\n\nYeni bir aksiyon oluşturuldu:\n\nAksiyon ID: %d\nTanımlayan: %s\nKategori: %s\nAçıklama: %s\n\nDetayları görmek için admin paneline giriş yapın.\n\nSaygılar,\n%s",
-                    $data['id'],
-                    $data['tanımlayan'],
-                    $data['kategori'],
-                    $data['aciklama'],
-                    $site_name
-                );
-                break;
-                
-            case 'task_created':
-                $subject = sprintf('[%s] Yeni Görev Atandı', $site_name);
-                $message = sprintf(
-                    "Merhaba,\n\nSize yeni bir görev atandı:\n\nGörev: %s\nAksiyon ID: %d\nBaşlangıç Tarihi: %s\nHedef Tarih: %s\n\nDetayları görmek için sisteme giriş yapın.\n\nSaygılar,\n%s",
-                    $data['content'],
-                    $data['action_id'],
-                    $data['baslangic_tarihi'],
-                    $data['hedef_bitis_tarihi'],
-                    $site_name
-                );
-                break;
-                
-            case 'task_completed':
-                $subject = sprintf('[%s] Görev Tamamlandı', $site_name);
-                $message = sprintf(
-                    "Merhaba,\n\nBir görev tamamlandı:\n\nGörev: %s\nTamamlayan: %s\nTamamlanma Tarihi: %s\n\nDetayları görmek için admin paneline giriş yapın.\n\nSaygılar,\n%s",
-                    $data['content'],
-                    $data['sorumlu'],
-                    $data['tamamlanma_tarihi'],
-                    $site_name
-                );
-                break;
-        }
-        
-        // Send to admin
-        wp_mail($admin_email, $subject, $message);
-        
-        // Send to responsible users if specified
-        if (isset($data['sorumlu_emails']) && is_array($data['sorumlu_emails'])) {
-            foreach ($data['sorumlu_emails'] as $email) {
-                wp_mail($email, $subject, $message);
-            }
+ * Send email notification
+ */
+public function send_email_notification($type, $data) {
+    $admin_email = get_option('admin_email');
+    $site_name = get_bloginfo('name');
+    
+    switch ($type) {
+        case 'action_created':
+            $subject = sprintf('[%s] Yeni Aksiyon Oluşturuldu', $site_name);
+            $message = sprintf(
+                "Merhaba,\n\nYeni bir aksiyon oluşturuldu:\n\nAksiyon ID: %d\nTanımlayan: %s\nKategori: %s\nAçıklama: %s\n\nDetayları görmek için admin paneline giriş yapın.\n\nSaygılar,\n%s",
+                $data['id'],
+                $data['tanımlayan'],
+                $data['kategori'],
+                $data['aciklama'],
+                $site_name
+            );
+            break;
+            
+        case 'task_created':
+            $subject = sprintf('[%s] Yeni Görev Atandı', $site_name);
+            $message = sprintf(
+                "Merhaba,\n\nSize yeni bir görev atandı:\n\nGörev: %s\nAksiyon ID: %d\nBaşlangıç Tarihi: %s\nHedef Tarih: %s\n\nDetayları görmek için sisteme giriş yapın.\n\nSaygılar,\n%s",
+                $data['content'],
+                $data['action_id'],
+                $data['baslangic_tarihi'],
+                $data['hedef_bitis_tarihi'],
+                $site_name
+            );
+            break;
+            
+        case 'task_completed':
+            $subject = sprintf('[%s] Görev Tamamlandı', $site_name);
+            $message = sprintf(
+                "Merhaba,\n\nBir görev tamamlandı:\n\nGörev: %s\nTamamlayan: %s\nTamamlanma Tarihi: %s\n\nDetayları görmek için admin paneline giriş yapın.\n\nSaygılar,\n%s",
+                $data['content'],
+                $data['sorumlu'],
+                $data['tamamlanma_tarihi'],
+                $site_name
+            );
+            break;
+            
+        case 'note_added':
+            $subject = sprintf('[%s] Göreve Yeni Not Eklendi', $site_name);
+            $message = sprintf(
+                "Merhaba,\n\nBir göreve yeni bir not eklendi:\n\nGörev ID: %d\nAksiyon ID: %d\nNot: %s\nEkleyen: %s\n\nDetayları görmek için sisteme giriş yapın.\n\nSaygılar,\n%s",
+                $data['task_id'],
+                $data['action_id'],
+                $data['content'],
+                $data['sorumlu'],
+                $site_name
+            );
+            break;
+            
+        case 'note_replied':
+            $subject = sprintf('[%s] Görev Notuna Cevap Verildi', $site_name);
+            $message = sprintf(
+                "Merhaba,\n\nBir görev notuna cevap verildi:\n\nGörev ID: %d\nAksiyon ID: %d\nCevap: %s\nCevaplayan: %s\n\nDetayları görmek için sisteme giriş yapın.\n\nSaygılar,\n%s",
+                $data['task_id'],
+                $data['action_id'],
+                $data['content'],
+                $data['sorumlu'],
+                $site_name
+            );
+            break;
+    }
+    
+    // Send to admin
+    wp_mail($admin_email, $subject, $message);
+    
+    // Send to responsible users if specified
+    if (isset($data['sorumlu_emails']) && is_array($data['sorumlu_emails'])) {
+        foreach ($data['sorumlu_emails'] as $email) {
+            wp_mail($email, $subject, $message);
         }
     }
+}
     
     /**
      * AJAX: Refresh dashboard stats

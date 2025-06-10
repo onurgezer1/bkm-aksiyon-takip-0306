@@ -31,8 +31,46 @@ if (!current_user_can('read')) {
 // Get data
 $actions_table = $wpdb->prefix . 'bkm_actions';
 $tasks_table = $wpdb->prefix . 'bkm_tasks';
+$notes_table = $wpdb->prefix . 'bkm_task_notes';
 $categories_table = $wpdb->prefix . 'bkm_categories';
 $performance_table = $wpdb->prefix . 'bkm_performance';
+
+// Determine SQL query based on user role
+$user_roles = $current_user->roles;
+$is_admin = in_array('administrator', $user_roles);
+$current_user_id = $current_user->ID;
+
+error_log("Is admin: " . ($is_admin ? 'true' : 'false') . ", User roles: " . implode(', ', $user_roles) . ", User ID: " . $current_user_id);
+
+if ($is_admin) {
+    // Admins see all actions
+    $actions_query = "SELECT a.*, 
+                            u.display_name as tanımlayan_name,
+                            c.name as kategori_name,
+                            p.name as performans_name
+                     FROM $actions_table a
+                     LEFT JOIN {$wpdb->users} u ON a.tanımlayan_id = u.ID
+                     LEFT JOIN $categories_table c ON a.kategori_id = c.id
+                     LEFT JOIN $performance_table p ON a.performans_id = p.id
+                     ORDER BY a.created_at DESC";
+} else {
+    // Non-admins see only their assigned actions
+    $actions_query = $wpdb->prepare(
+        "SELECT a.*, 
+                u.display_name as tanımlayan_name,
+                c.name as kategori_name,
+                p.name as performans_name
+         FROM $actions_table a
+         LEFT JOIN {$wpdb->users} u ON a.tanımlayan_id = u.ID
+         LEFT JOIN $categories_table c ON a.kategori_id = c.id
+         LEFT JOIN $performance_table p ON a.performans_id = p.id
+         WHERE a.sorumlu_ids LIKE %s
+         ORDER BY a.created_at DESC",
+        '%' . $wpdb->esc_like($current_user_id) . '%'
+    );
+}
+
+$actions = $wpdb->get_results($actions_query);
 
 // Handle task actions
 if (isset($_POST['task_action']) && wp_verify_nonce($_POST['bkm_frontend_nonce'], 'bkm_frontend_action')) {
@@ -126,27 +164,73 @@ if (isset($_POST['add_task']) && wp_verify_nonce($_POST['bkm_frontend_nonce'], '
     }
 }
 
+// Handle add note
+if (isset($_POST['note_action']) && wp_verify_nonce($_POST['bkm_frontend_nonce'], 'bkm_frontend_action')) {
+    if ($_POST['note_action'] === 'add_note' || $_POST['note_action'] === 'reply_note') {
+        $task_id = intval($_POST['task_id']);
+        $content = sanitize_textarea_field($_POST['note_content']);
+        $parent_note_id = isset($_POST['parent_note_id']) ? intval($_POST['parent_note_id']) : null;
+        
+        error_log("Note action: " . $_POST['note_action'] . ", task_id: $task_id, parent_note_id: $parent_note_id, content: $content");
+
+        // Check if user is authorized to add note
+        $task = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $tasks_table WHERE id = %d",
+            $task_id
+        ));
+        
+        if ($task && (($task->sorumlu_id == $current_user_id && $_POST['note_action'] === 'add_note') || $is_admin)) {
+            if (!empty($content)) {
+                $result = $wpdb->insert(
+                    $notes_table,
+                    array(
+                        'task_id' => $task_id,
+                        'user_id' => $current_user_id,
+                        'content' => $content,
+                        'parent_note_id' => $parent_note_id
+                    ),
+                    array('%d', '%d', '%s', '%d')
+                );
+                
+                if ($result !== false) {
+                    // Send email notification
+                    $plugin = BKM_Aksiyon_Takip::get_instance();
+                    $notification_data = array(
+                        'content' => $content,
+                        'action_id' => $task->action_id,
+                        'task_id' => $task_id,
+                        'sorumlu' => $current_user->display_name,
+                        'sorumlu_emails' => array(get_user_by('ID', $task->sorumlu_id)->user_email)
+                    );
+                    
+                    $plugin->send_email_notification($_POST['note_action'] === 'add_note' ? 'note_added' : 'note_replied', $notification_data);
+                    
+                    // Redirect to prevent form resubmission
+                    global $wp;
+                    wp_safe_redirect(home_url(add_query_arg(array('success' => 'note_added'), $wp->request)));
+                    exit;
+                } else {
+                    echo '<div class="bkm-error">Not eklenirken bir hata oluştu.</div>';
+                }
+            } else {
+                echo '<div class="bkm-error">Not içeriği boş olamaz.</div>';
+            }
+        } else {
+            echo '<div class="bkm-error">Bu göreve not ekleme veya cevap yazma yetkiniz yok.</div>';
+        }
+    }
+}
+
 // Display success messages
 if (isset($_GET['success'])) {
     if ($_GET['success'] === 'task_completed') {
         echo '<div class="bkm-success">Görev başarıyla tamamlandı!</div>';
     } elseif ($_GET['success'] === 'task_added') {
         echo '<div class="bkm-success">Görev başarıyla eklendi!</div>';
+    } elseif ($_GET['success'] === 'note_added') {
+        echo '<div class="bkm-success">Not başarıyla eklendi!</div>';
     }
 }
-
-// Get actions with related data
-$actions = $wpdb->get_results(
-    "SELECT a.*, 
-            u.display_name as tanımlayan_name,
-            c.name as kategori_name,
-            p.name as performans_name
-     FROM $actions_table a
-     LEFT JOIN {$wpdb->users} u ON a.tanımlayan_id = u.ID
-     LEFT JOIN $categories_table c ON a.kategori_id = c.id
-     LEFT JOIN $performance_table p ON a.performans_id = p.id
-     ORDER BY a.created_at DESC"
-);
 
 // Get users for task assignment
 $users = get_users(array('role__in' => array('administrator', 'editor', 'author', 'contributor')));
@@ -306,6 +390,18 @@ $users = get_users(array('role__in' => array('administrator', 'editor', 'author'
                                             <?php if ($action_tasks): ?>
                                                 <div class="bkm-tasks-list">
                                                     <?php foreach ($action_tasks as $task): ?>
+                                                        <?php
+                                                        // Get notes for this task
+                                                        $task_notes = $wpdb->get_results($wpdb->prepare(
+                                                            "SELECT n.*, u.display_name as user_name 
+                                                             FROM $notes_table n 
+                                                             LEFT JOIN {$wpdb->users} u ON n.user_id = u.ID 
+                                                             WHERE n.task_id = %d 
+                                                             ORDER BY n.created_at ASC",
+                                                            $task->id
+                                                        ));
+                                                        $has_notes = !empty($task_notes);
+                                                        ?>
                                                         <div class="bkm-task-item <?php echo $task->tamamlandi ? 'completed' : ''; ?>">
                                                             <div class="bkm-task-content">
                                                                 <p><strong><?php echo esc_html($task->content); ?></strong></p>
@@ -325,8 +421,8 @@ $users = get_users(array('role__in' => array('administrator', 'editor', 'author'
                                                                 </div>
                                                             </div>
                                                             
-                                                            <?php if ($task->sorumlu_id == $current_user->ID && !$task->tamamlandi): ?>
-                                                                <div class="bkm-task-actions">
+                                                            <div class="bkm-task-actions">
+                                                                <?php if ($task->sorumlu_id == $current_user->ID && !$task->tamamlandi): ?>
                                                                     <form method="post" style="display: inline;">
                                                                         <?php wp_nonce_field('bkm_frontend_action', 'bkm_frontend_nonce'); ?>
                                                                         <input type="hidden" name="task_action" value="complete_task" />
@@ -336,9 +432,83 @@ $users = get_users(array('role__in' => array('administrator', 'editor', 'author'
                                                                             Tamamla
                                                                         </button>
                                                                     </form>
-                                                                </div>
-                                                            <?php endif; ?>
+                                                                <?php endif; ?>
+                                                                
+                                                                <?php if ($task->sorumlu_id == $current_user->ID || $is_admin): ?>
+                                                                    <button class="bkm-btn bkm-btn-small" onclick="toggleNoteForm(<?php echo $task->id; ?>)">
+                                                                        Not Ekle
+                                                                    </button>
+                                                                    <?php if ($has_notes): ?>
+                                                                        <button class="bkm-btn bkm-btn-small" onclick="toggleNotes(<?php echo $task->id; ?>)">
+                                                                            Notları Göster (<?php echo count($task_notes); ?>)
+                                                                        </button>
+                                                                    <?php endif; ?>
+                                                                <?php endif; ?>
+                                                            </div>
                                                         </div>
+                                                        
+                                                        <!-- Note Form (hidden by default) -->
+                                                        <?php if ($task->sorumlu_id == $current_user->ID || $is_admin): ?>
+                                                            <div id="note-form-<?php echo $task->id; ?>" class="bkm-note-form" style="display: none;">
+                                                                <form method="post" action="">
+                                                                    <?php wp_nonce_field('bkm_frontend_action', 'bkm_frontend_nonce'); ?>
+                                                                    <input type="hidden" name="note_action" value="add_note" />
+                                                                    <input type="hidden" name="task_id" value="<?php echo $task->id; ?>" />
+                                                                    <textarea name="note_content" rows="3" placeholder="Notunuzu buraya yazın..." required></textarea>
+                                                                    <div class="bkm-form-actions">
+                                                                        <button type="submit" class="bkm-btn bkm-btn-primary bkm-btn-small">
+                                                                            Not Ekle
+                                                                        </button>
+                                                                        <button type="button" class="bkm-btn bkm-btn-secondary bkm-btn-small" onclick="toggleNoteForm(<?php echo $task->id; ?>)">
+                                                                            İptal
+                                                                        </button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                            
+                                                            <!-- Notes Section (hidden by default) -->
+                                                            <div id="notes-<?php echo $task->id; ?>" class="bkm-notes-section" style="display: none;">
+                                                                <?php if ($task_notes): ?>
+                                                                    <?php
+                                                                    // Recursive function to display notes with hierarchy
+                                                                    function display_notes($notes, $parent_id = null, $level = 0) {
+                                                                        global $wpdb, $is_admin, $current_user_id;
+                                                                        // Ensure $is_admin is correctly accessed
+                                                                        $is_admin = $GLOBALS['is_admin']; // Use global scope
+                                                                        error_log("Displaying notes, is_admin: " . ($is_admin ? 'true' : 'false') . ", parent_id: " . $parent_id . ", note count: " . count($notes));
+                                                                        foreach ($notes as $note) {
+                                                                            if ($note->parent_note_id == $parent_id) {
+                                                                                echo '<div class="bkm-note-item' . ($note->parent_note_id ? ' bkm-note-reply' : '') . '" style="margin-left: ' . ($level * 20) . 'px;">';
+                                                                                echo '<p><strong>' . esc_html($note->user_name) . ':</strong> ' . esc_html($note->content) . '</p>';
+                                                                                echo '<span class="bkm-note-meta">' . date('d.m.Y H:i', strtotime($note->created_at)) . '</span>';
+                                                                                if ($is_admin) { // Allow reply for all notes if admin
+                                                                                    echo '<button class="bkm-btn bkm-btn-small" onclick="toggleReplyForm(' . $task->id . ', ' . $note->id . ')">Notu Cevapla</button>';
+                                                                                    echo '<div id="reply-form-' . $task->id . '-' . $note->id . '" class="bkm-note-form" style="display: none;">';
+                                                                                    echo '<form method="post" action="">';
+                                                                                    wp_nonce_field('bkm_frontend_action', 'bkm_frontend_nonce');
+                                                                                    echo '<input type="hidden" name="note_action" value="reply_note" />';
+                                                                                    echo '<input type="hidden" name="task_id" value="' . $task->id . '" />';
+                                                                                    echo '<input type="hidden" name="parent_note_id" value="' . $note->id . '" />';
+                                                                                    echo '<textarea name="note_content" rows="3" placeholder="Cevabınızı buraya yazın..." required></textarea>';
+                                                                                    echo '<div class="bkm-form-actions">';
+                                                                                    echo '<button type="submit" class="bkm-btn bkm-btn-primary bkm-btn-small">Cevap Gönder</button>';
+                                                                                    echo '<button type="button" class="bkm-btn bkm-btn-secondary bkm-btn-small" onclick="toggleReplyForm(' . $task->id . ', ' . $note->id . ')">İptal</button>';
+                                                                                    echo '</div>';
+                                                                                    echo '</form>';
+                                                                                    echo '</div>';
+                                                                                }
+                                                                                echo '</div>';
+                                                                                display_notes($notes, $note->id, $level + 1); // Recursive call for replies
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    display_notes($task_notes);
+                                                                    ?>
+                                                                <?php else: ?>
+                                                                    <p>Bu görev için henüz not bulunmamaktadır.</p>
+                                                                <?php endif; ?>
+                                                            </div>
+                                                        <?php endif; ?>
                                                     <?php endforeach; ?>
                                                 </div>
                                             <?php else: ?>
@@ -376,6 +546,33 @@ function toggleTasks(actionId) {
         tasksRow.style.display = 'table-row';
     } else {
         tasksRow.style.display = 'none';
+    }
+}
+
+function toggleNoteForm(taskId) {
+    var noteForm = document.getElementById('note-form-' + taskId);
+    if (noteForm.style.display === 'none' || noteForm.style.display === '') {
+        noteForm.style.display = 'block';
+    } else {
+        noteForm.style.display = 'none';
+    }
+}
+
+function toggleNotes(taskId) {
+    var notesSection = document.getElementById('notes-' + taskId);
+    if (notesSection.style.display === 'none' || notesSection.style.display === '') {
+        notesSection.style.display = 'block';
+    } else {
+        notesSection.style.display = 'none';
+    }
+}
+
+function toggleReplyForm(taskId, noteId) {
+    var replyForm = document.getElementById('reply-form-' + taskId + '-' + noteId);
+    if (replyForm.style.display === 'none' || replyForm.style.display === '') {
+        replyForm.style.display = 'block';
+    } else {
+        replyForm.style.display = 'none';
     }
 }
 </script>

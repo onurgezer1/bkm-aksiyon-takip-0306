@@ -836,4 +836,94 @@
         box-shadow: none;
         border: 1px solid #000;
     }
+
+/* ===========================================
+   NOTE FORM AND NOTES SECTION
+   =========================================== */
+.bkm-note-form {
+    margin-top: 10px;
+    padding: 15px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+}
+
+.bkm-note-form textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    background: #000000;
+    color: #ffffff;
+    font-size: 14px;
+    resize: vertical;
+}
+
+.bkm-note-form textarea::placeholder {
+    color: #cccccc;
+}
+
+.bkm-note-form textarea:focus {
+    border-color: #007cba;
+    outline: none;
+}
+
+.bkm-notes-section {
+    margin-top: 15px;
+    padding: 15px;
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+}
+
+.bkm-note-item {
+    margin-bottom: 10px;
+    padding: 10px 10px 10px 30px; /* Sol padding ile girinti */
+    border-left: 3px solid #007cba;
+    background: #f8f9fa;
+    border-radius: 4px;
+    position: relative;
+}
+
+.bkm-note-item.bkm-note-reply {
+    border-left-color: #28a745;
+    margin-left: 20px; /* Cevapların ek girintisi */
+}
+
+.bkm-note-item::before {
+    content: "→"; /* Ok simgesi */
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #007cba;
+    font-size: 16px;
+}
+
+.bkm-note-reply::before {
+    content: "↳"; /* Cevap için farklı bir ok simgesi */
+    color: #28a745;
+}
+
+.bkm-note-item p {
+    margin: 0 0 5px;
+    font-size: 14px;
+    color: #2c3e50;
+}
+
+.bkm-note-meta {
+    font-size: 12px;
+    color: #6c757d;
+    display: block;
+}
+
+/* Hiyerarşi için ek stil */
+.bkm-note-item .bkm-note-item {
+    margin-left: 40px; /* Daha derin seviyeler için artan girinti */
+}
+
+.bkm-note-item .bkm-note-item::before {
+    left: 20px; /* Okun pozisyonu */
+}
+
 }
