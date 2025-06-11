@@ -40,7 +40,7 @@ $user_roles = $current_user->roles;
 $is_admin = in_array('administrator', $user_roles);
 $current_user_id = $current_user->ID;
 
-error_log("Is admin: " . ($is_admin ? 'true' : 'false') . ", User roles: " . implode(', ', $user_roles) . ", User ID: " . $current_user_id);
+error_log("Is admin (global): " . ($is_admin ? 'true' : 'false') . ", User roles: " . implode(', ', $user_roles) . ", User ID: " . $current_user_id);
 
 if ($is_admin) {
     // Admins see all actions
@@ -71,6 +71,40 @@ if ($is_admin) {
 }
 
 $actions = $wpdb->get_results($actions_query);
+
+// Define display_notes function once at the top
+function display_notes($notes, $parent_id = null, $level = 0, $is_admin_param = false, $task = null) {
+    global $wpdb, $current_user_id;
+    error_log("Displaying notes, is_admin_param: " . ($is_admin_param ? 'true' : 'false') . ", parent_id: " . $parent_id . ", note count: " . count($notes) . ", task_id: " . ($task ? $task->id : 'null'));
+    foreach ($notes as $note) {
+        if ($note->parent_note_id == $parent_id) {
+            $reply_class = ($note->parent_note_id ? ' bkm-note-reply' : '');
+            echo '<div class="bkm-note-item' . $reply_class . '" data-level="' . $level . '" data-note-id="' . $note->id . '">';
+            echo '<div class="bkm-note-content">';
+            echo '<p><strong>' . esc_html($note->user_name) . ':</strong> ' . esc_html($note->content) . '</p>';
+            echo '<div class="bkm-note-meta">' . date('d.m.Y H:i', strtotime($note->created_at)) . '</div>';
+            if ($is_admin_param && $task) {
+                echo '<button class="bkm-btn bkm-btn-small" onclick="toggleReplyForm(' . esc_js($task->id) . ', ' . esc_js($note->id) . ')">Notu Cevapla</button>';
+                echo '<div id="reply-form-' . esc_attr($task->id) . '-' . esc_attr($note->id) . '" class="bkm-note-form" style="display: none;">';
+                echo '<form method="post" action="">';
+                wp_nonce_field('bkm_frontend_action', 'bkm_frontend_nonce');
+                echo '<input type="hidden" name="note_action" value="reply_note" />';
+                echo '<input type="hidden" name="task_id" value="' . esc_attr($task->id) . '" />';
+                echo '<input type="hidden" name="parent_note_id" value="' . esc_attr($note->id) . '" />';
+                echo '<textarea name="note_content" rows="3" placeholder="Cevabınızı buraya yazın..." required></textarea>';
+                echo '<div class="bkm-form-actions">';
+                echo '<button type="submit" class="bkm-btn bkm-btn-primary bkm-btn-small">Cevap Gönder</button>';
+                echo '<button type="button" class="bkm-btn bkm-btn-secondary bkm-btn-small" onclick="toggleReplyForm(' . esc_js($task->id) . ', ' . esc_js($note->id) . ')">İptal</button>';
+                echo '</div>';
+                echo '</form>';
+                echo '</div>';
+            }
+            echo '</div>';
+            echo '</div>';
+            display_notes($notes, $note->id, $level + 1, $is_admin_param, $task); // Pass task recursively
+        }
+    }
+}
 
 // Handle task actions
 if (isset($_POST['task_action']) && wp_verify_nonce($_POST['bkm_frontend_nonce'], 'bkm_frontend_action')) {
@@ -469,41 +503,7 @@ $users = get_users(array('role__in' => array('administrator', 'editor', 'author'
                                                             <!-- Notes Section (hidden by default) -->
                                                             <div id="notes-<?php echo $task->id; ?>" class="bkm-notes-section" style="display: none;">
                                                                 <?php if ($task_notes): ?>
-                                                                    <?php
-                                                                    // Recursive function to display notes with hierarchy
-                                                                    function display_notes($notes, $parent_id = null, $level = 0) {
-                                                                        global $wpdb, $is_admin, $current_user_id;
-                                                                        // Ensure $is_admin is correctly accessed
-                                                                        $is_admin = $GLOBALS['is_admin']; // Use global scope
-                                                                        error_log("Displaying notes, is_admin: " . ($is_admin ? 'true' : 'false') . ", parent_id: " . $parent_id . ", note count: " . count($notes));
-                                                                        foreach ($notes as $note) {
-                                                                            if ($note->parent_note_id == $parent_id) {
-                                                                                echo '<div class="bkm-note-item' . ($note->parent_note_id ? ' bkm-note-reply' : '') . '" style="margin-left: ' . ($level * 20) . 'px;">';
-                                                                                echo '<p><strong>' . esc_html($note->user_name) . ':</strong> ' . esc_html($note->content) . '</p>';
-                                                                                echo '<span class="bkm-note-meta">' . date('d.m.Y H:i', strtotime($note->created_at)) . '</span>';
-                                                                                if ($is_admin) { // Allow reply for all notes if admin
-                                                                                    echo '<button class="bkm-btn bkm-btn-small" onclick="toggleReplyForm(' . $task->id . ', ' . $note->id . ')">Notu Cevapla</button>';
-                                                                                    echo '<div id="reply-form-' . $task->id . '-' . $note->id . '" class="bkm-note-form" style="display: none;">';
-                                                                                    echo '<form method="post" action="">';
-                                                                                    wp_nonce_field('bkm_frontend_action', 'bkm_frontend_nonce');
-                                                                                    echo '<input type="hidden" name="note_action" value="reply_note" />';
-                                                                                    echo '<input type="hidden" name="task_id" value="' . $task->id . '" />';
-                                                                                    echo '<input type="hidden" name="parent_note_id" value="' . $note->id . '" />';
-                                                                                    echo '<textarea name="note_content" rows="3" placeholder="Cevabınızı buraya yazın..." required></textarea>';
-                                                                                    echo '<div class="bkm-form-actions">';
-                                                                                    echo '<button type="submit" class="bkm-btn bkm-btn-primary bkm-btn-small">Cevap Gönder</button>';
-                                                                                    echo '<button type="button" class="bkm-btn bkm-btn-secondary bkm-btn-small" onclick="toggleReplyForm(' . $task->id . ', ' . $note->id . ')">İptal</button>';
-                                                                                    echo '</div>';
-                                                                                    echo '</form>';
-                                                                                    echo '</div>';
-                                                                                }
-                                                                                echo '</div>';
-                                                                                display_notes($notes, $note->id, $level + 1); // Recursive call for replies
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                    display_notes($task_notes);
-                                                                    ?>
+                                                                    <?php display_notes($task_notes, null, 0, $is_admin, $task); ?>
                                                                 <?php else: ?>
                                                                     <p>Bu görev için henüz not bulunmamaktadır.</p>
                                                                 <?php endif; ?>

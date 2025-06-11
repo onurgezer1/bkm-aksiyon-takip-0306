@@ -836,9 +836,10 @@
         box-shadow: none;
         border: 1px solid #000;
     }
+}
 
 /* ===========================================
-   NOTE FORM AND NOTES SECTION
+   NOTE FORM AND NOTES SECTION - BASIT OK SİSTEMİ
    =========================================== */
 .bkm-note-form {
     margin-top: 10px;
@@ -857,6 +858,7 @@
     color: #ffffff;
     font-size: 14px;
     resize: vertical;
+    box-sizing: border-box;
 }
 
 .bkm-note-form textarea::placeholder {
@@ -866,64 +868,182 @@
 .bkm-note-form textarea:focus {
     border-color: #007cba;
     outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.1);
 }
 
+/* Notes section ana container */
 .bkm-notes-section {
-    margin-top: 15px;
-    padding: 15px;
-    background: #ffffff;
-    border: 1px solid #e9ecef;
+    padding: 15px 0;
+    margin-top: 10px;
+    background: #fafafa;
     border-radius: 8px;
 }
 
+/* Her not item için temel stil */
 .bkm-note-item {
-    margin-bottom: 10px;
-    padding: 10px 10px 10px 30px; /* Sol padding ile girinti */
-    border-left: 3px solid #007cba;
-    background: #f8f9fa;
-    border-radius: 4px;
     position: relative;
+    padding: 15px 20px 15px 60px; /* Sol tarafta ok için 60px boşluk */
+    margin-bottom: 10px;
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.bkm-note-item.bkm-note-reply {
-    border-left-color: #28a745;
-    margin-left: 20px; /* Cevapların ek girintisi */
-}
-
-.bkm-note-item::before {
-    content: "→"; /* Ok simgesi */
+/* ANA NOTLAR İÇİN OK */
+.bkm-note-item:not(.bkm-note-reply):before {
+    content: "→";
     position: absolute;
-    left: 10px;
+    left: 20px;
     top: 50%;
     transform: translateY(-50%);
-    color: #007cba;
+    width: 30px;
+    height: 30px;
+    background: #007cba;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 16px;
+    font-weight: bold;
+    z-index: 2;
 }
 
-.bkm-note-reply::before {
-    content: "↳"; /* Cevap için farklı bir ok simgesi */
+/* CEVAP NOTLARI İÇİN FARKLI OK VE STİL */
+.bkm-note-item.bkm-note-reply {
+    margin-left: 40px;
+    border-left: 4px solid #28a745;
+    background: #f8fff8;
+    padding-left: 50px; /* Cevaplar için daha az padding */
+}
+
+.bkm-note-item.bkm-note-reply:before {
+    content: "↳";
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 25px;
+    height: 25px;
+    background: #28a745;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    z-index: 2;
+}
+
+/* Not içeriği */
+.bkm-note-content {
+    position: relative;
+    z-index: 1;
+}
+
+.bkm-note-content p {
+    margin: 0 0 8px 0;
+    line-height: 1.5;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.bkm-note-content p strong {
+    color: #007cba;
+    font-weight: 600;
+}
+
+.bkm-note-reply .bkm-note-content p strong {
     color: #28a745;
 }
 
-.bkm-note-item p {
-    margin: 0 0 5px;
-    font-size: 14px;
-    color: #2c3e50;
-}
-
+/* Not meta bilgileri */
 .bkm-note-meta {
     font-size: 12px;
     color: #6c757d;
-    display: block;
+    margin-top: 8px;
+    font-style: italic;
 }
 
-/* Hiyerarşi için ek stil */
-.bkm-note-item .bkm-note-item {
-    margin-left: 40px; /* Daha derin seviyeler için artan girinti */
+/* Seviye bazında indentasyon */
+.bkm-note-item[data-level="1"] {
+    margin-left: 40px;
 }
 
-.bkm-note-item .bkm-note-item::before {
-    left: 20px; /* Okun pozisyonu */
+.bkm-note-item[data-level="2"] {
+    margin-left: 80px;
 }
 
+.bkm-note-item[data-level="3"] {
+    margin-left: 120px;
+}
+
+/* Daha derin seviyeler için farklı renkler */
+.bkm-note-item[data-level="2"]:before {
+    background: #6c757d;
+    content: "⤷";
+}
+
+.bkm-note-item[data-level="3"]:before {
+    background: #17a2b8;
+    content: "⤴";
+}
+
+/* Test için debug border */
+.bkm-notes-section {
+    border: 2px dashed #ff0000 !important; /* Kırmızı kenarlık - test için */
+}
+
+.bkm-note-item {
+    border: 2px solid #00ff00 !important; /* Yeşil kenarlık - test için */
+}
+
+/* Dark mode için uyum */
+@media (prefers-color-scheme: dark) {
+    .bkm-notes-section {
+        background: #1a1a1a;
+    }
+    
+    .bkm-note-item {
+        background: #2d2d2d;
+        border-color: #404040;
+        color: #fff;
+    }
+    
+    .bkm-note-reply {
+        background: #1a2f1a;
+        border-left-color: #28a745;
+    }
+    
+    .bkm-note-content p {
+        color: #fff;
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .bkm-note-item {
+        padding-left: 50px;
+    }
+    
+    .bkm-note-item:before {
+        width: 25px;
+        height: 25px;
+        font-size: 14px;
+        left: 15px;
+    }
+    
+    .bkm-note-item.bkm-note-reply {
+        margin-left: 20px;
+        padding-left: 40px;
+    }
+    
+    .bkm-note-item.bkm-note-reply:before {
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+        left: 10px;
+    }
 }
