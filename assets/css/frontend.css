@@ -877,6 +877,7 @@
     margin-top: 10px;
     background: #fafafa;
     border-radius: 8px;
+    border: 2px solid #e3f2fd; /* Açık mavi ton - ana notların açık versiyonu */
 }
 
 /* Her not item için temel stil */
@@ -885,7 +886,7 @@
     padding: 15px 20px 15px 60px; /* Sol tarafta ok için 60px boşluk */
     margin-bottom: 10px;
     background: #ffffff;
-    border: 1px solid #e9ecef;
+    border: 1px solid #e3f2fd; /* Ana notlar için açık mavi kenarlık */
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
@@ -916,6 +917,7 @@
     border-left: 4px solid #28a745;
     background: #f8fff8;
     padding-left: 50px; /* Cevaplar için daha az padding */
+    border: 1px solid #e8f5e9; /* Cevap notları için açık yeşil kenarlık */
 }
 
 .bkm-note-item.bkm-note-reply:before {
@@ -982,43 +984,80 @@
 
 /* Daha derin seviyeler için farklı renkler */
 .bkm-note-item[data-level="2"]:before {
-    background: #6c757d;
+    background: #fd7e14; /* Turuncu renk */
     content: "⤷";
 }
 
 .bkm-note-item[data-level="3"]:before {
-    background: #17a2b8;
+    background: #fd7e14; /* Turuncu renk */
     content: "⤴";
 }
 
-/* Test için debug border */
-.bkm-notes-section {
-    border: 2px dashed #ff0000 !important; /* Kırmızı kenarlık - test için */
+/* Daha derin seviyeler için kenarlık renkleri */
+.bkm-note-item[data-level="2"] {
+    border: 1px solid #fff3e0; /* Turuncu tonların açık versiyonu */
+    background: #fffbf7; /* Çok açık turuncu arka plan */
+}
+
+.bkm-note-item[data-level="3"] {
+    border: 1px solid #fff3e0; /* Turuncu tonların açık versiyonu */
+    background: #fffbf7; /* Çok açık turuncu arka plan */
+}
+
+/* 2. seviye ve üstü için turuncu yazı rengi */
+.bkm-note-item[data-level="2"] .bkm-note-content p strong,
+.bkm-note-item[data-level="3"] .bkm-note-content p strong {
+    color: #fd7e14; /* Turuncu yazı rengi */
+}
+
+/* Debug kenarlıkları kaldır - artık güzel görünüyor */
+/* .bkm-notes-section {
+    border: 2px dashed #ff0000 !important;
 }
 
 .bkm-note-item {
-    border: 2px solid #00ff00 !important; /* Yeşil kenarlık - test için */
-}
+    border: 2px solid #00ff00 !important;
+} */
 
 /* Dark mode için uyum */
 @media (prefers-color-scheme: dark) {
     .bkm-notes-section {
         background: #1a1a1a;
+        border-color: #1e3a8a; /* Dark mode için koyu mavi */
     }
     
     .bkm-note-item {
         background: #2d2d2d;
-        border-color: #404040;
+        border-color: #1e3a8a; /* Dark mode için koyu mavi */
         color: #fff;
     }
     
     .bkm-note-reply {
         background: #1a2f1a;
-        border-left-color: #28a745;
+        border-color: #166534; /* Dark mode için koyu yeşil */
+    }
+    
+    .bkm-note-item[data-level="2"],
+    .bkm-note-item[data-level="3"] {
+        background: #2d1810; /* Dark mode için koyu turuncu arka plan */
+        border-color: #c2410c; /* Dark mode için koyu turuncu kenarlık */
     }
     
     .bkm-note-content p {
         color: #fff;
+    }
+    
+    .bkm-note-content p strong {
+        color: #60a5fa; /* Dark mode için açık mavi */
+    }
+    
+    .bkm-note-reply .bkm-note-content p strong {
+        color: #4ade80; /* Dark mode için açık yeşil */
+    }
+    
+    .bkm-note-item[data-level="2"] .bkm-note-content p strong,
+    .bkm-note-item[data-level="3"] .bkm-note-content p strong {
+        color: #fb923c; /* Dark mode için açık turuncu */
     }
 }
 
