@@ -401,30 +401,36 @@
 .bkm-form-grid .bkm-field input,
 .bkm-form-grid .bkm-field textarea,
 .bkm-form-grid .bkm-field select {
-    background-color: #000000; /* Siyah arka plan */
-    color: #ffffff; /* Beyaz yazı rengi */
-    border: 1px solid #444444; /* Kenarlık rengi */
+    background: linear-gradient(135deg, #e3f2fd 0%, #f0f9ff 100%); /* Güzel mavi gradyan */
+    color: #1565c0; /* Koyu mavi yazı rengi */
+    border: 2px solid #90caf9; /* Açık mavi kenarlık */
     padding: 12px 16px;
     width: 100%;
     box-sizing: border-box;
+    font-weight: 500;
+    transition: all 0.3s ease;
 }
 
 .bkm-form-grid .bkm-field input::placeholder,
 .bkm-form-grid .bkm-field textarea::placeholder {
-    color: #cccccc; /* Görünür placeholder rengi */
+    color: #64b5f6; /* Mavi placeholder rengi */
+    opacity: 0.8;
 }
 
 .bkm-form-grid .bkm-field input:focus,
 .bkm-form-grid .bkm-field textarea:focus,
 .bkm-form-grid .bkm-field select:focus {
     outline: none;
-    border-color: #0073aa; /* WordPress mavi tonu */
-    box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.1);
+    border-color: #1976d2; /* Daha koyu mavi focus rengi */
+    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
+    background: linear-gradient(135deg, #e1f5fe 0%, #f3e5f5 100%);
+    transform: translateY(-1px);
 }
 
 .bkm-form-grid .bkm-field select option {
-    background-color: #000000; /* Siyah arka plan */
-    color: #ffffff; /* Beyaz yazı rengi */
+    background: linear-gradient(135deg, #e3f2fd 0%, #f0f9ff 100%); /* Mavi gradyan */
+    color: #1565c0; /* Koyu mavi yazı rengi */
+    padding: 8px 12px;
 }
 
 .bkm-form-actions {
@@ -612,477 +618,763 @@
     opacity: 0.9;
 }
 
+.bkm-task-item.completed::after {
+    content: '✓ TAMAMLANDI';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.4);
+}
+
+/* Görev içerik alanı iyileştirmeleri */
 .bkm-task-content {
     flex: 1;
+    margin-right: 20px;
+    grid-column: 1;
+    grid-row: 1;
 }
 
 .bkm-task-content p {
-    margin: 0 0 10px 0;
+    margin: 0 0 12px 0;
     color: #2c3e50;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 1.4;
 }
 
 .bkm-task-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 10px;
+    gap: 10px;
+    margin-bottom: 15px;
     font-size: 12px;
     color: #6c757d;
 }
 
 .bkm-task-meta span {
-    background: #f8f9fa;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-weight: 500;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
 }
 
+.bkm-task-meta span:hover {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border-color: #90caf9;
+    color: #1565c0;
+    transform: translateY(-1px);
+}
+
+/* Progress bar iyileştirmeleri */
 .bkm-task-progress {
-    max-width: 150px;
-    margin-top: 5px;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+    border-radius: 25px;
+    height: 24px;
+    overflow: hidden;
+    min-width: 150px;
+    border: 1px solid #e0e0e0;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
 }
 
+.bkm-task-progress .bkm-progress-bar {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 50%, #17a2b8 100%);
+    height: 100%;
+    border-radius: 25px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+.bkm-task-progress .bkm-progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 11px;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    z-index: 2;
+}
+
+/* Görev aksiyonları iyileştirmeleri */
 .bkm-task-actions {
     margin-left: 15px;
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 8px;
+    align-items: flex-end;
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
 }
 
 /* ===========================================
-   RESPONSIVE DESIGN
+   NOTLAR BÖLÜMÜ İYİLEŞTİRMELERİ
    =========================================== */
-@media (max-width: 768px) {
-    .bkm-frontend-container {
-        padding: 15px;
-    }
-    
-    .bkm-login-form {
-        padding: 30px;
-        margin: 0 15px;
-    }
-    
-    .bkm-dashboard-header {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-        padding: 25px 20px;
-    }
-    
-    .bkm-dashboard-header h1 {
-        font-size: 24px;
-    }
-    
-    .bkm-actions-section {
-        padding: 20px;
-    }
-    
-    .bkm-section-header {
-        flex-direction: column;
-        gap: 15px;
-        align-items: stretch;
-    }
-    
-    .bkm-form-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-    
-    .bkm-table {
-        font-size: 12px;
-    }
-    
-    .bkm-table th,
-    .bkm-table td {
-        padding: 8px 10px;
-    }
-    
-    .bkm-task-item {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .bkm-task-actions {
-        margin-left: 0;
-        align-self: flex-start;
-        flex-direction: row;
-    }
-    
-    .bkm-user-info {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .bkm-action-desc {
-        max-width: none;
-        white-space: normal;
-    }
-}
 
-@media (max-width: 480px) {
-    .bkm-login-form {
-        padding: 10px;
-    }
-    
-    .bkm-dashboard-header h1 {
-        font-size: 20px;
-    }
-    
-    .bkm-task-meta {
-        flex-direction: column;
-        gap: 5px;
-    }
-    
-    .bkm-task-meta span {
-        display: inline-block;
-        margin-right: 5px;
-        margin-bottom: 3px;
-    }
-    
-    .bkm-form-actions {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .bkm-btn {
-        width: 100%;
-        text-align: center;
-    }
-}
-
-/* ===========================================
-   ACCESSIBILITY IMPROVEMENTS
-   =========================================== */
-.bkm-btn:focus,
-.bkm-field input:focus,
-.bkm-field textarea:focus,
-.bkm-field select:focus {
-    outline: 2px solid #007cba;
-    outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .bkm-btn,
-    .bkm-field input,
-    .bkm-task-item,
-    .bkm-progress-bar {
-        transition: none;
-    }
-    
-    .bkm-spinner {
-        animation: none;
-    }
-}
-
-/* ===========================================
-   DARK MODE SUPPORT
-   =========================================== */
-@media (prefers-color-scheme: dark) {
-    .bkm-frontend-container {
-        background: #1a1a1a;
-        color: #fff;
-    }
-    
-    .bkm-login-form,
-    .bkm-dashboard,
-    .bkm-task-item {
-        background: #2d2d2d;
-        border-color: #404040;
-        color: #fff;
-    }
-    
-    .bkm-task-form .bkm-form-grid .bkm-field input,
-    .bkm-task-form .bkm-form-grid .bkm-field textarea,
-    .bkm-task-form .bkm-form-grid .bkm-field select {
-        background: #000000; /* Siyah görev formu için */
-        border-color: #555;
-        color: #fff;
-    }
-    
-    .bkm-table th {
-        background: #444;
-        color: #fff;
-    }
-    
-    .bkm-table tbody tr:hover {
-        background: #404040;
-    }
-    
-    .bkm-task-form {
-        background: #2d2d2d;
-        border-color: #404040;
-    }
-}
-
-/* ===========================================
-   PRINT STYLES
-   =========================================== */
-@media print {
-    .bkm-login-form,
-    .bkm-btn,
-    .bkm-task-actions,
-    .bkm-logout {
-        display: none;
-    }
-    
-    .bkm-dashboard-header {
-        background: none;
-        color: #000;
-        border-bottom: 2px solid #000;
-    }
-    
-    .bkm-table {
-        box-shadow: none;
-        border: 1px solid #000;
-    }
-}
-
-/* ===========================================
-   NOTE FORM AND NOTES SECTION - BASIT OK SİSTEMİ
-   =========================================== */
+/* Not ekleme formu iyileştirmeleri */
 .bkm-note-form {
-    margin-top: 10px;
-    padding: 15px;
-    background: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
+    display: none; /* Initially hidden, controlled by JavaScript */
+    background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 100%);
+    border: 2px solid #90caf9;
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 15px;
+    box-shadow: 0 4px 15px rgba(144, 202, 249, 0.2);
+    animation: noteFormSlideDown 0.3s ease-out;
+    grid-column: 1 / -1;
+}
+
+@keyframes noteFormSlideDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+        max-height: 0;
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 300px;
+    }
 }
 
 .bkm-note-form textarea {
     width: 100%;
-    padding: 12px;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    background: #000000;
-    color: #ffffff;
+    min-height: 100px;
+    max-height: 200px;
+    padding: 15px;
+    border: 2px solid #e3f2fd;
+    border-radius: 12px;
     font-size: 14px;
+    line-height: 1.6;
+    background: linear-gradient(135deg, #ffffff 0%, #f3e5f5 100%);
+    color: #2c3e50;
+    font-weight: 500;
     resize: vertical;
-    box-sizing: border-box;
-}
-
-.bkm-note-form textarea::placeholder {
-    color: #cccccc;
+    transition: all 0.3s ease;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .bkm-note-form textarea:focus {
-    border-color: #007cba;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.1);
+    border-color: #1976d2;
+    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
+    background: linear-gradient(135deg, #ffffff 0%, #e8eaf6 100%);
+    transform: translateY(-1px);
 }
 
-/* Notes section ana container */
-.bkm-notes-section {
-    padding: 15px 0;
-    margin-top: 10px;
-    background: #fafafa;
-    border-radius: 8px;
-    border: 2px solid #e3f2fd; /* Açık mavi ton - ana notların açık versiyonu */
+.bkm-note-form textarea::placeholder {
+    color: #9e9e9e;
+    font-style: italic;
+    opacity: 0.8;
 }
 
-/* Her not item için temel stil */
-.bkm-note-item {
-    position: relative;
-    padding: 15px 20px 15px 60px; /* Sol tarafta ok için 60px boşluk */
-    margin-bottom: 10px;
-    background: #ffffff;
-    border: 1px solid #e3f2fd; /* Ana notlar için açık mavi kenarlık */
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-/* ANA NOTLAR İÇİN OK */
-.bkm-note-item:not(.bkm-note-reply):before {
-    content: "→";
-    position: absolute;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 30px;
-    height: 30px;
-    background: #007cba;
-    color: white;
-    border-radius: 50%;
+.bkm-note-form .bkm-form-actions {
     display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+}
+
+.bkm-note-form .bkm-btn {
+    border-radius: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 12px;
+    padding: 10px 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bkm-note-form .bkm-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+/* Notlar gösterim alanı iyileştirmeleri */
+.bkm-notes-section {
+    display: none; /* Initially hidden, controlled by JavaScript */
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    border: 1px solid #e0e0e0;
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 15px;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
+    animation: notesSlideDown 0.3s ease-out;
+    grid-column: 1 / -1;
+}
+
+@keyframes notesSlideDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+        max-height: 0;
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 500px;
+    }
+}
+
+.bkm-notes-section h5 {
+    margin: 0 0 15px 0;
+    color: #495057;
+    font-size: 16px;
+    font-weight: 700;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e9ecef;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.bkm-notes-section .bkm-note-item {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.bkm-notes-section .bkm-note-item:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    transform: translateY(-1px);
+    border-color: #90caf9;
+}
+
+.bkm-notes-section .bkm-note-meta {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.bkm-notes-section .bkm-note-author {
+    font-weight: 700;
+    color: #1976d2;
+    font-size: 13px;
+}
+
+.bkm-notes-section .bkm-note-date {
+    font-size: 11px;
+    color: #6c757d;
+    background: #f8f9fa;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-family: monospace;
+}
+
+.bkm-notes-section .bkm-note-content {
+    color: #2c3e50;
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* Boş not durumu iyileştirmesi */
+.bkm-notes-section p:only-child {
+    text-align: center;
+    color: #9e9e9e;
+    font-style: italic;
+    margin: 20px 0;
+    padding: 30px;
+    border: 2px dashed #e0e0e0;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
+}
+
+/* ===========================================
+   AKSIYON FORMU STİLLERİ  
+   =========================================== */
+#bkm-action-form {
+    background: linear-gradient(135deg, #6c7ce7 0%, #a29bfe 100%);
+    border: 2px solid #74b9ff;
+    border-radius: 15px;
+    padding: 25px;
+    margin: 20px 0;
+    box-shadow: 0 8px 25px rgba(116, 185, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+#bkm-action-form::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    pointer-events: none;
+}
+
+#bkm-action-form h3 {
+    color: white;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+#bkm-action-form .bkm-field label {
+    color: white;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+#bkm-action-form .bkm-field input,
+#bkm-action-form .bkm-field select,
+#bkm-action-form .bkm-field textarea {
+    background: rgba(255,255,255,0.95);
+    border: 2px solid rgba(255,255,255,0.8);
+    transition: all 0.3s ease;
+}
+
+#bkm-action-form .bkm-field input:focus,
+#bkm-action-form .bkm-field select:focus,
+#bkm-action-form .bkm-field textarea:focus {
+    background: white;
+    border-color: #00b894;
+    box-shadow: 0 0 0 3px rgba(0, 184, 148, 0.2);
+    transform: translateY(-1px);
+}
+
+#bkm-action-form .bkm-btn {
+    background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 184, 148, 0.3);
+}
+
+#bkm-action-form .bkm-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 184, 148, 0.4);
+    background: linear-gradient(135deg, #00a085 0%, #00b894 100%);
+}
+
+/* ===========================================
+   AKSIYON DETAYLARI İYİLEŞTİRMELERİ
+   =========================================== */
+.bkm-action-details-row {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 10px 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.bkm-action-details-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    align-items: start;
+}
+
+.bkm-action-detail-section {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 4px solid #6c7ce7;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.bkm-action-detail-section h4 {
+    color: #2c3e50;
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.bkm-action-detail-section p {
+    margin: 5px 0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* Kompakt progress bar için */
+.bkm-action-details-row .bkm-progress {
+    max-width: 200px;
+    height: 16px;
+}
+
+.bkm-action-details-row .bkm-progress-text {
+    font-size: 10px;
+}
+
+/* Responsive düzenleme */
+@media (max-width: 768px) {
+    .bkm-action-details-content {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .bkm-action-detail-section {
+        padding: 12px;
+    }
+    
+    .bkm-task-item {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .bkm-task-content {
+        margin-right: 0;
+    }
+    
+    .bkm-task-actions {
+        margin-left: 0;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+    
+    .bkm-task-meta {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .bkm-note-form .bkm-form-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .bkm-note-form .bkm-btn {
+        width: 100%;
+    }
+}
+
+/* Not butonları için stil */
+.bkm-note-actions {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #e9ecef;
+}
+
+/* ===========================================
+   HİYERARŞİK NOT TASARIMI
+   =========================================== */
+
+/* Ana notlar */
+.bkm-main-note {
+    position: relative;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: 2px solid #e3f2fd;
+    border-left: 5px solid #2196f3;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.1);
+    transition: all 0.3s ease;
+}
+
+.bkm-main-note:hover {
+    border-left-color: #1976d2;
+    box-shadow: 0 6px 20px rgba(33, 150, 243, 0.15);
+    transform: translateY(-1px);
+}
+
+.bkm-main-note .bkm-note-indicator {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
+    background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.bkm-main-note .bkm-note-content-wrapper {
+    padding: 15px;
+}
+
+/* Cevap notları */
+.bkm-reply-note {
+    position: relative;
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    border: 2px solid #ffb74d;
+    border-left: 4px solid #ff9800;
+    border-radius: 10px;
+    margin: 10px 0 10px 40px;
+    box-shadow: 0 3px 8px rgba(255, 152, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.bkm-reply-note:hover {
+    border-left-color: #f57c00;
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.15);
+}
+
+.bkm-reply-note .bkm-note-content-wrapper {
+    padding: 12px;
+}
+
+/* Bağlantı çizgisi */
+.bkm-reply-connector {
+    position: absolute;
+    left: -40px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #ff9800 0%, rgba(255, 152, 0, 0.3) 100%);
+}
+
+.bkm-reply-connector::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: -8px;
+    width: 20px;
+    height: 2px;
+    background: #ff9800;
+}
+
+/* Ok işareti */
+.bkm-reply-arrow {
+    position: absolute;
+    left: -35px;
+    top: 15px;
+    color: #ff9800;
     font-size: 16px;
     font-weight: bold;
-    z-index: 2;
-}
-
-/* CEVAP NOTLARI İÇİN FARKLI OK VE STİL */
-.bkm-note-item.bkm-note-reply {
-    margin-left: 40px;
-    border-left: 4px solid #28a745;
-    background: #f8fff8;
-    padding-left: 50px; /* Cevaplar için daha az padding */
-    border: 1px solid #e8f5e9; /* Cevap notları için açık yeşil kenarlık */
-}
-
-.bkm-note-item.bkm-note-reply:before {
-    content: "↳";
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 25px;
-    height: 25px;
-    background: #28a745;
-    color: white;
+    background: white;
+    padding: 2px;
     border-radius: 50%;
+    border: 1px solid #ff9800;
+    width: 24px;
+    height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
-    font-weight: bold;
-    z-index: 2;
+    box-shadow: 0 2px 4px rgba(255, 152, 0, 0.3);
+}
+
+/* Cevap badge */
+.bkm-reply-badge {
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+    color: white;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 8px;
+    box-shadow: 0 2px 4px rgba(255, 152, 0, 0.3);
+}
+
+/* Not meta bilgileri güncellemesi */
+.bkm-main-note .bkm-note-meta {
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(33, 150, 243, 0.1);
+}
+
+.bkm-reply-note .bkm-note-meta {
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 152, 0, 0.1);
 }
 
 /* Not içeriği */
-.bkm-note-content {
-    position: relative;
-    z-index: 1;
-}
-
-.bkm-note-content p {
-    margin: 0 0 8px 0;
-    line-height: 1.5;
-    color: #2c3e50;
+.bkm-main-note .bkm-note-content {
     font-size: 14px;
+    line-height: 1.6;
+    color: #2c3e50;
+    margin-bottom: 10px;
 }
 
-.bkm-note-content p strong {
-    color: #007cba;
+.bkm-reply-note .bkm-note-content {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #5d4037;
+    margin-bottom: 0;
+}
+
+/* Yazar ve tarih */
+.bkm-main-note .bkm-note-author {
+    color: #1976d2;
     font-weight: 600;
 }
 
-.bkm-note-reply .bkm-note-content p strong {
-    color: #28a745;
+.bkm-reply-note .bkm-note-author {
+    color: #f57c00;
+    font-weight: 600;
 }
 
-/* Not meta bilgileri */
-.bkm-note-meta {
+.bkm-main-note .bkm-note-date {
+    color: #666;
     font-size: 12px;
-    color: #6c757d;
-    margin-top: 8px;
-    font-style: italic;
 }
 
-/* Seviye bazında indentasyon */
-.bkm-note-item[data-level="1"] {
-    margin-left: 40px;
+.bkm-reply-note .bkm-note-date {
+    color: #8d6e63;
+    font-size: 11px;
 }
 
-.bkm-note-item[data-level="2"] {
-    margin-left: 80px;
-}
-
-.bkm-note-item[data-level="3"] {
-    margin-left: 120px;
-}
-
-/* Daha derin seviyeler için farklı renkler */
-.bkm-note-item[data-level="2"]:before {
-    background: #fd7e14; /* Turuncu renk */
-    content: "⤷";
-}
-
-.bkm-note-item[data-level="3"]:before {
-    background: #fd7e14; /* Turuncu renk */
-    content: "⤴";
-}
-
-/* Daha derin seviyeler için kenarlık renkleri */
-.bkm-note-item[data-level="2"] {
-    border: 1px solid #fff3e0; /* Turuncu tonların açık versiyonu */
-    background: #fffbf7; /* Çok açık turuncu arka plan */
-}
-
-.bkm-note-item[data-level="3"] {
-    border: 1px solid #fff3e0; /* Turuncu tonların açık versiyonu */
-    background: #fffbf7; /* Çok açık turuncu arka plan */
-}
-
-/* 2. seviye ve üstü için turuncu yazı rengi */
-.bkm-note-item[data-level="2"] .bkm-note-content p strong,
-.bkm-note-item[data-level="3"] .bkm-note-content p strong {
-    color: #fd7e14; /* Turuncu yazı rengi */
-}
-
-/* Debug kenarlıkları kaldır - artık güzel görünüyor */
-/* .bkm-notes-section {
-    border: 2px dashed #ff0000 !important;
-}
-
-.bkm-note-item {
-    border: 2px solid #00ff00 !important;
-} */
-
-/* Dark mode için uyum */
-@media (prefers-color-scheme: dark) {
-    .bkm-notes-section {
-        background: #1a1a1a;
-        border-color: #1e3a8a; /* Dark mode için koyu mavi */
-    }
-    
-    .bkm-note-item {
-        background: #2d2d2d;
-        border-color: #1e3a8a; /* Dark mode için koyu mavi */
-        color: #fff;
-    }
-    
-    .bkm-note-reply {
-        background: #1a2f1a;
-        border-color: #166534; /* Dark mode için koyu yeşil */
-    }
-    
-    .bkm-note-item[data-level="2"],
-    .bkm-note-item[data-level="3"] {
-        background: #2d1810; /* Dark mode için koyu turuncu arka plan */
-        border-color: #c2410c; /* Dark mode için koyu turuncu kenarlık */
-    }
-    
-    .bkm-note-content p {
-        color: #fff;
-    }
-    
-    .bkm-note-content p strong {
-        color: #60a5fa; /* Dark mode için açık mavi */
-    }
-    
-    .bkm-note-reply .bkm-note-content p strong {
-        color: #4ade80; /* Dark mode için açık yeşil */
-    }
-    
-    .bkm-note-item[data-level="2"] .bkm-note-content p strong,
-    .bkm-note-item[data-level="3"] .bkm-note-content p strong {
-        color: #fb923c; /* Dark mode için açık turuncu */
-    }
-}
-
-/* Responsive design */
+/* Responsive düzenleme */
 @media (max-width: 768px) {
-    .bkm-note-item {
-        padding-left: 50px;
-    }
-    
-    .bkm-note-item:before {
-        width: 25px;
-        height: 25px;
-        font-size: 14px;
-        left: 15px;
-    }
-    
-    .bkm-note-item.bkm-note-reply {
+    .bkm-reply-note {
         margin-left: 20px;
-        padding-left: 40px;
     }
     
-    .bkm-note-item.bkm-note-reply:before {
+    .bkm-reply-connector {
+        left: -20px;
+    }
+    
+    .bkm-reply-arrow {
+        left: -18px;
         width: 20px;
         height: 20px;
-        font-size: 12px;
-        left: 10px;
+        font-size: 14px;
+    }
+    
+    .bkm-reply-connector::before {
+        width: 12px;
+        left: -6px;
+    }
+}
+
+/* ===========================================
+   NOT HIGHLIGHT ANIMASYONLARI
+   =========================================== */
+
+/* Yeni not ekleme sonrası highlight animasyonu */
+.new-note-highlight {
+    animation: notePulse 2s ease-in-out;
+    position: relative;
+    z-index: 5;
+}
+
+@keyframes notePulse {
+    0% {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7);
+    }
+    25% {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        transform: scale(1.02);
+        box-shadow: 0 0 0 8px rgba(251, 191, 36, 0.3);
+    }
+    50% {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        transform: scale(1.03);
+        box-shadow: 0 0 0 12px rgba(251, 191, 36, 0.1);
+    }
+    75% {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        transform: scale(1.01);
+        box-shadow: 0 0 0 6px rgba(251, 191, 36, 0.2);
+    }
+    100% {
+        background: transparent;
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
+    }
+}
+
+/* Yeni not ekleme fade-in animasyonu */
+.bkm-main-note.new-note-highlight,
+.bkm-reply-note.new-note-highlight {
+    animation: noteSlideIn 0.5s ease-out, notePulse 2s ease-in-out 0.3s;
+}
+
+@keyframes noteSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Loading state animasyonu */
+.bkm-note-form.loading,
+.bkm-reply-form.loading {
+    opacity: 0.7;
+    pointer-events: none;
+    position: relative;
+}
+
+.bkm-note-form.loading::after,
+.bkm-reply-form.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    z-index: 10;
+}
+
+/* Smooth transitions for note sections */
+.bkm-notes-section {
+    transition: all 0.3s ease;
+}
+
+.bkm-notes-section[style*="display: none"] {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+}
+
+.bkm-notes-section:not([style*="display: none"]) {
+    opacity: 1;
+    max-height: none;
+}
+
+/* Success notification improvement */
+.bkm-notification.success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    font-weight: 500;
+    animation: slideInRight 0.3s ease-out;
+}
+
+.bkm-notification.error {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    font-weight: 500;
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
     }
 }

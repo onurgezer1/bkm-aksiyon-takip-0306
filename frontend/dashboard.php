@@ -83,14 +83,11 @@ function display_notes($notes, $parent_id = null, $level = 0, $is_admin_param = 
             echo '<div class="bkm-note-content">';
             echo '<p><strong>' . esc_html($note->user_name) . ':</strong> ' . esc_html($note->content) . '</p>';
             echo '<div class="bkm-note-meta">' . date('d.m.Y H:i', strtotime($note->created_at)) . '</div>';
-            if ($is_admin_param && $task) {
+            // All logged-in users can reply to notes
+            if ($task) {
                 echo '<button class="bkm-btn bkm-btn-small" onclick="toggleReplyForm(' . esc_js($task->id) . ', ' . esc_js($note->id) . ')">Notu Cevapla</button>';
                 echo '<div id="reply-form-' . esc_attr($task->id) . '-' . esc_attr($note->id) . '" class="bkm-note-form" style="display: none;">';
-                echo '<form method="post" action="">';
-                wp_nonce_field('bkm_frontend_action', 'bkm_frontend_nonce');
-                echo '<input type="hidden" name="note_action" value="reply_note" />';
-                echo '<input type="hidden" name="task_id" value="' . esc_attr($task->id) . '" />';
-                echo '<input type="hidden" name="parent_note_id" value="' . esc_attr($note->id) . '" />';
+                echo '<form class="bkm-reply-form" data-task-id="' . esc_attr($task->id) . '" data-parent-id="' . esc_attr($note->id) . '">';
                 echo '<textarea name="note_content" rows="3" placeholder="Cevabınızı buraya yazın..." required></textarea>';
                 echo '<div class="bkm-form-actions">';
                 echo '<button type="submit" class="bkm-btn bkm-btn-primary bkm-btn-small">Cevap Gönder</button>';
@@ -148,57 +145,16 @@ if (isset($_POST['task_action']) && wp_verify_nonce($_POST['bkm_frontend_nonce']
     }
 }
 
-// Handle add task (for admin/editor)
+// Handle add task - DISABLED: Now using AJAX
+/*
+// OLD POST-based task adding - replaced with AJAX
 if (isset($_POST['add_task']) && wp_verify_nonce($_POST['bkm_frontend_nonce'], 'bkm_frontend_action') && current_user_can('edit_posts')) {
-    $action_id = intval($_POST['action_id']);
-    $content = sanitize_textarea_field($_POST['task_content']);
-    $baslangic_tarihi = sanitize_text_field($_POST['baslangic_tarihi']);
-    $sorumlu_id = intval($_POST['sorumlu_id']);
-    $hedef_bitis_tarihi = sanitize_text_field($_POST['hedef_bitis_tarihi']);
-    $ilerleme_durumu = intval($_POST['ilerleme_durumu']);
-    
-    if (!empty($content) && $action_id > 0 && $sorumlu_id > 0) {
-        $result = $wpdb->insert(
-            $tasks_table,
-            array(
-                'action_id' => $action_id,
-                'content' => $content,
-                'baslangic_tarihi' => $baslangic_tarihi,
-                'sorumlu_id' => $sorumlu_id,
-                'hedef_bitis_tarihi' => $hedef_bitis_tarihi,
-                'ilerleme_durumu' => $ilerleme_durumu
-            ),
-            array('%d', '%s', '%s', '%d', '%s', '%d')
-        );
-        
-        if ($result !== false) {
-            // Send email notification
-            $plugin = BKM_Aksiyon_Takip::get_instance();
-            $sorumlu_user = get_user_by('ID', $sorumlu_id);
-            
-            $notification_data = array(
-                'action_id' => $action_id,
-                'content' => $content,
-                'baslangic_tarihi' => $baslangic_tarihi,
-                'hedef_bitis_tarihi' => $hedef_bitis_tarihi,
-                'sorumlu_emails' => $sorumlu_user ? array($sorumlu_user->user_email) : array()
-            );
-            
-            $plugin->send_email_notification('task_created', $notification_data);
-            
-            // Redirect to prevent form resubmission
-            global $wp;
-            wp_safe_redirect(home_url(add_query_arg(array('success' => 'task_added'), $wp->request)));
-            exit;
-        } else {
-            echo '<div class="bkm-error">Görev eklenirken bir hata oluştu.</div>';
-        }
-    } else {
-        echo '<div class="bkm-error">Lütfen tüm zorunlu alanları doldurun.</div>';
-    }
+    // ... old code moved to ajax_add_task() in bkm-aksiyon-takip.php
 }
+*/
 
-// Handle add note
+// Handle add note - DISABLED: Now using AJAX
+/*
 if (isset($_POST['note_action']) && wp_verify_nonce($_POST['bkm_frontend_nonce'], 'bkm_frontend_action')) {
     if ($_POST['note_action'] === 'add_note' || $_POST['note_action'] === 'reply_note') {
         $task_id = intval($_POST['task_id']);
@@ -253,7 +209,7 @@ if (isset($_POST['note_action']) && wp_verify_nonce($_POST['bkm_frontend_nonce']
             echo '<div class="bkm-error">Bu göreve not ekleme veya cevap yazma yetkiniz yok.</div>';
         }
     }
-}
+*/
 
 // Display success messages
 if (isset($_GET['success'])) {
@@ -268,6 +224,10 @@ if (isset($_GET['success'])) {
 
 // Get users for task assignment
 $users = get_users(array('role__in' => array('administrator', 'editor', 'author', 'contributor')));
+
+// Get categories and performance data for action form
+$categories = $wpdb->get_results("SELECT * FROM $categories_table ORDER BY name ASC");
+$performances = $wpdb->get_results("SELECT * FROM $performance_table ORDER BY name ASC");
 ?>
 
 <div class="bkm-frontend-container">
@@ -285,24 +245,114 @@ $users = get_users(array('role__in' => array('administrator', 'editor', 'author'
         <div class="bkm-actions-section">
             <div class="bkm-section-header">
                 <h2>Aksiyonlar</h2>
-                <?php if (current_user_can('edit_posts')): ?>
-                    <button class="bkm-btn bkm-btn-primary" onclick="toggleTaskForm()">
-                        Görev Ekle
-                    </button>
-                <?php endif; ?>
+                <div class="bkm-action-buttons">
+                    <?php if (current_user_can('manage_options')): ?>
+                        <button class="bkm-btn bkm-btn-success" onclick="toggleActionForm()">
+                            ➕ Yeni Aksiyon
+                        </button>
+                    <?php endif; ?>
+                    <?php if (current_user_can('edit_posts')): ?>
+                        <button class="bkm-btn bkm-btn-primary" onclick="toggleTaskForm()">
+                            📋 Görev Ekle
+                        </button>
+                    <?php endif; ?>
+                </div>
             </div>
+            
+            <!-- Add Action Form (hidden by default) -->
+            <?php if (current_user_can('manage_options')): ?>
+                <div id="bkm-action-form" class="bkm-task-form" style="display: none;">
+                    <h3>Yeni Aksiyon Ekle</h3>
+                    
+                    <form id="bkm-action-form-element">
+                        <!-- İlk satır: Kategori -->
+                        <div class="bkm-form-row">
+                            <div class="bkm-field">
+                                <label for="action_kategori_id">Kategori <span class="required">*</span>:</label>
+                                <select name="kategori_id" id="action_kategori_id" required>
+                                    <option value="">Seçiniz...</option>
+                                    <?php foreach ($categories as $category): ?>
+                                        <option value="<?php echo $category->id; ?>"><?php echo esc_html($category->name); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- İkinci satır: Performans, Önem Derecesi, Hedef Tarih -->
+                        <div class="bkm-form-grid-3">
+                            <div class="bkm-field">
+                                <label for="action_performans_id">Performans <span class="required">*</span>:</label>
+                                <select name="performans_id" id="action_performans_id" required>
+                                    <option value="">Seçiniz...</option>
+                                    <?php foreach ($performances as $performance): ?>
+                                        <option value="<?php echo $performance->id; ?>"><?php echo esc_html($performance->name); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            
+                            <div class="bkm-field">
+                                <label for="action_onem_derecesi">Önem Derecesi <span class="required">*</span>:</label>
+                                <select name="onem_derecesi" id="action_onem_derecesi" required>
+                                    <option value="">Seçiniz...</option>
+                                    <option value="1">Düşük</option>
+                                    <option value="2">Orta</option>
+                                    <option value="3">Yüksek</option>
+                                </select>
+                            </div>
+                            
+                            <div class="bkm-field">
+                                <label for="action_hedef_tarih">Hedef Tarih <span class="required">*</span>:</label>
+                                <input type="date" name="hedef_tarih" id="action_hedef_tarih" required />
+                            </div>
+                        </div>
+                        
+                        <!-- Üçüncü satır: Sorumlu Kişiler ve Tespit Konusu -->
+                        <div class="bkm-form-grid-2">
+                            <div class="bkm-field">
+                                <label for="action_sorumlu_ids">Sorumlu Kişiler <span class="required">*</span>:</label>
+                                <select name="sorumlu_ids[]" id="action_sorumlu_ids" multiple required size="5">
+                                    <?php foreach ($users as $user): ?>
+                                        <option value="<?php echo $user->ID; ?>"><?php echo esc_html($user->display_name); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <small>Ctrl tuşu ile birden fazla seçim yapabilirsiniz</small>
+                            </div>
+                            
+                            <div class="bkm-field">
+                                <label for="action_tespit_konusu">Tespit Konusu <span class="required">*</span>:</label>
+                                <textarea name="tespit_konusu" id="action_tespit_konusu" rows="5" required placeholder="Tespit edilen konuyu kısaca açıklayın..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Dördüncü satır: Açıklama (tam genişlik) -->
+                        <div class="bkm-form-row">
+                            <div class="bkm-field">
+                                <label for="action_aciklama">Açıklama <span class="required">*</span>:</label>
+                                <textarea name="aciklama" id="action_aciklama" rows="4" required placeholder="Aksiyonun detaylı açıklamasını yazın..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Form Actions (sağ alt) -->
+                        <div class="bkm-form-actions">
+                            <button type="submit" class="bkm-btn bkm-btn-success">
+                                ✅ Aksiyon Ekle
+                            </button>
+                            <button type="button" class="bkm-btn bkm-btn-secondary" onclick="toggleActionForm()">
+                                ❌ İptal
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            <?php endif; ?>
             
             <!-- Add Task Form (hidden by default) -->
             <?php if (current_user_can('edit_posts')): ?>
                 <div id="bkm-task-form" class="bkm-task-form" style="display: none;">
                     <h3>Yeni Görev Ekle</h3>
-                    <form method="post" action="">
-                        <?php wp_nonce_field('bkm_frontend_action', 'bkm_frontend_nonce'); ?>
-                        <input type="hidden" name="add_task" value="1" />
-                        
+                    <form id="bkm-task-form-element">
                         <div class="bkm-form-grid">
                             <div class="bkm-field">
-                                <label for="action_id">Aksiyon:</label>
+                                <label for="action_id">Aksiyon <span class="required">*</span>:</label>
                                 <select name="action_id" id="action_id" required>
                                     <option value="">Seçiniz...</option>
                                     <?php foreach ($actions as $action): ?>
@@ -314,17 +364,17 @@ $users = get_users(array('role__in' => array('administrator', 'editor', 'author'
                             </div>
                             
                             <div class="bkm-field">
-                                <label for="task_content">Görev İçeriği:</label>
+                                <label for="task_content">Görev İçeriği <span class="required">*</span>:</label>
                                 <textarea name="task_content" id="task_content" rows="3" required></textarea>
                             </div>
                             
                             <div class="bkm-field">
-                                <label for="baslangic_tarihi">Başlangıç Tarihi:</label>
+                                <label for="baslangic_tarihi">Başlangıç Tarihi <span class="required">*</span>:</label>
                                 <input type="date" name="baslangic_tarihi" id="baslangic_tarihi" required />
                             </div>
                             
                             <div class="bkm-field">
-                                <label for="sorumlu_id">Sorumlu:</label>
+                                <label for="sorumlu_id">Sorumlu <span class="required">*</span>:</label>
                                 <select name="sorumlu_id" id="sorumlu_id" required>
                                     <option value="">Seçiniz...</option>
                                     <?php foreach ($users as $user): ?>
@@ -334,7 +384,7 @@ $users = get_users(array('role__in' => array('administrator', 'editor', 'author'
                             </div>
                             
                             <div class="bkm-field">
-                                <label for="hedef_bitis_tarihi">Hedef Bitiş Tarihi:</label>
+                                <label for="hedef_bitis_tarihi">Hedef Bitiş Tarihi <span class="required">*</span>:</label>
                                 <input type="date" name="hedef_bitis_tarihi" id="hedef_bitis_tarihi" required />
                             </div>
                             
@@ -410,11 +460,126 @@ $users = get_users(array('role__in' => array('administrator', 'editor', 'author'
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <button class="bkm-btn bkm-btn-small" onclick="toggleTasks(<?php echo $action->id; ?>)">
-                                            Görevleri Göster (<?php echo count($action_tasks); ?>)
-                                        </button>
+                                        <div class="bkm-action-buttons-cell">
+                                            <?php if (current_user_can('manage_options')): ?>
+                                                <button class="bkm-btn bkm-btn-small bkm-btn-info" onclick="toggleActionDetails(<?php echo $action->id; ?>)">
+                                                    📋 Detaylar
+                                                </button>
+                                            <?php endif; ?>
+                                            <button class="bkm-btn bkm-btn-small" onclick="toggleTasks(<?php echo $action->id; ?>)">
+                                                📝 Görevler (<?php echo count($action_tasks); ?>)
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
+                                
+                                <!-- Action Details Row -->
+                                <?php if (current_user_can('manage_options')): ?>
+                                <tr id="details-<?php echo $action->id; ?>" class="bkm-action-details-row" style="display: none;">
+                                    <td colspan="8">
+                                        <div class="bkm-action-details-container">
+                                            <h4>📋 Aksiyon Detayları</h4>
+                                            
+                                            <div class="bkm-details-grid">
+                                                <div class="bkm-detail-section">
+                                                    <h5>📊 Genel Bilgiler</h5>
+                                                    <div class="bkm-detail-item">
+                                                        <strong>Aksiyon ID:</strong> 
+                                                        <span>#<?php echo $action->id; ?></span>
+                                                    </div>
+                                                    <div class="bkm-detail-item">
+                                                        <strong>Tanımlayan:</strong> 
+                                                        <span><?php echo esc_html($action->tanımlayan_name); ?></span>
+                                                    </div>
+                                                    <div class="bkm-detail-item">
+                                                        <strong>Kategori:</strong> 
+                                                        <span class="bkm-badge bkm-badge-category"><?php echo esc_html($action->kategori_name); ?></span>
+                                                    </div>
+                                                    <div class="bkm-detail-item">
+                                                        <strong>Performans:</strong> 
+                                                        <span class="bkm-badge bkm-badge-performance"><?php echo esc_html($action->performans_name); ?></span>
+                                                    </div>
+                                                    <div class="bkm-detail-item">
+                                                        <strong>Önem Derecesi:</strong> 
+                                                        <span class="bkm-priority priority-<?php echo $action->onem_derecesi; ?>">
+                                                            <?php 
+                                                            $priority_labels = array(1 => 'Düşük', 2 => 'Orta', 3 => 'Yüksek');
+                                                            echo $priority_labels[$action->onem_derecesi];
+                                                            ?>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="bkm-detail-section">
+                                                    <h5>📅 Tarih Bilgileri</h5>
+                                                    <div class="bkm-detail-item">
+                                                        <strong>Hedef Tarih:</strong> 
+                                                        <span class="bkm-date"><?php echo date('d.m.Y', strtotime($action->hedef_tarih)); ?></span>
+                                                    </div>
+                                                    <div class="bkm-detail-item">
+                                                        <strong>Oluşturulma:</strong> 
+                                                        <span class="bkm-date"><?php echo date('d.m.Y H:i', strtotime($action->created_at)); ?></span>
+                                                    </div>
+                                                    <?php if ($action->kapanma_tarihi): ?>
+                                                    <div class="bkm-detail-item">
+                                                        <strong>Kapanma Tarihi:</strong> 
+                                                        <span class="bkm-date"><?php echo date('d.m.Y H:i', strtotime($action->kapanma_tarihi)); ?></span>
+                                                    </div>
+                                                    <?php endif; ?>
+                                                    <div class="bkm-detail-item">
+                                                        <strong>İlerleme Durumu:</strong> 
+                                                        <div class="bkm-progress">
+                                                            <div class="bkm-progress-bar" style="width: <?php echo $action->ilerleme_durumu; ?>%"></div>
+                                                            <span class="bkm-progress-text"><?php echo $action->ilerleme_durumu; ?>%</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="bkm-detail-section">
+                                                    <h5>👥 Sorumlu Kişiler</h5>
+                                                    <div class="bkm-detail-item">
+                                                        <?php 
+                                                        $sorumlu_ids = explode(',', $action->sorumlu_ids);
+                                                        $sorumlu_names = array();
+                                                        foreach ($sorumlu_ids as $sorumlu_id) {
+                                                            $user = get_user_by('ID', trim($sorumlu_id));
+                                                            if ($user) {
+                                                                $sorumlu_names[] = $user->display_name;
+                                                            }
+                                                        }
+                                                        ?>
+                                                        <div class="bkm-responsible-users">
+                                                            <?php foreach ($sorumlu_names as $name): ?>
+                                                                <span class="bkm-badge bkm-badge-user"><?php echo esc_html($name); ?></span>
+                                                            <?php endforeach; ?>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="bkm-detail-section bkm-detail-full">
+                                                <h5>🔍 Tespit Konusu</h5>
+                                                <div class="bkm-detail-content">
+                                                    <?php echo nl2br(esc_html($action->tespit_konusu)); ?>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="bkm-detail-section bkm-detail-full">
+                                                <h5>📝 Açıklama</h5>
+                                                <div class="bkm-detail-content">
+                                                    <?php echo nl2br(esc_html($action->aciklama)); ?>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="bkm-details-actions">
+                                                <button class="bkm-btn bkm-btn-secondary bkm-btn-small" onclick="toggleActionDetails(<?php echo $action->id; ?>)">
+                                                    ❌ Detayları Kapat
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <?php endif; ?>
                                 
                                 <!-- Tasks Row -->
                                 <tr id="tasks-<?php echo $action->id; ?>" class="bkm-tasks-row" style="display: none;">
@@ -484,9 +649,7 @@ $users = get_users(array('role__in' => array('administrator', 'editor', 'author'
                                                         <!-- Note Form (hidden by default) -->
                                                         <?php if ($task->sorumlu_id == $current_user->ID || $is_admin): ?>
                                                             <div id="note-form-<?php echo $task->id; ?>" class="bkm-note-form" style="display: none;">
-                                                                <form method="post" action="">
-                                                                    <?php wp_nonce_field('bkm_frontend_action', 'bkm_frontend_nonce'); ?>
-                                                                    <input type="hidden" name="note_action" value="add_note" />
+                                                                <form>
                                                                     <input type="hidden" name="task_id" value="<?php echo $task->id; ?>" />
                                                                     <textarea name="note_content" rows="3" placeholder="Notunuzu buraya yazın..." required></textarea>
                                                                     <div class="bkm-form-actions">
@@ -531,15 +694,6 @@ $users = get_users(array('role__in' => array('administrator', 'editor', 'author'
 </div>
 
 <script>
-function toggleTaskForm() {
-    var form = document.getElementById('bkm-task-form');
-    if (form.style.display === 'none' || form.style.display === '') {
-        form.style.display = 'block';
-    } else {
-        form.style.display = 'none';
-    }
-}
-
 function toggleTasks(actionId) {
     var tasksRow = document.getElementById('tasks-' + actionId);
     if (tasksRow.style.display === 'none' || tasksRow.style.display === '') {
@@ -549,23 +703,7 @@ function toggleTasks(actionId) {
     }
 }
 
-function toggleNoteForm(taskId) {
-    var noteForm = document.getElementById('note-form-' + taskId);
-    if (noteForm.style.display === 'none' || noteForm.style.display === '') {
-        noteForm.style.display = 'block';
-    } else {
-        noteForm.style.display = 'none';
-    }
-}
-
-function toggleNotes(taskId) {
-    var notesSection = document.getElementById('notes-' + taskId);
-    if (notesSection.style.display === 'none' || notesSection.style.display === '') {
-        notesSection.style.display = 'block';
-    } else {
-        notesSection.style.display = 'none';
-    }
-}
+// Görev notları fonksiyonları frontend.js'te tanımlandı - çakışmayı önlemek için buradakiler kaldırıldı
 
 function toggleReplyForm(taskId, noteId) {
     var replyForm = document.getElementById('reply-form-' + taskId + '-' + noteId);

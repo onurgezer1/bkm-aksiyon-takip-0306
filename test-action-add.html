@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BKM Aksiyon Takip - Aksiyon Ekleme Testi</title>
+    <meta charset="UTF-8">
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-result { 
+            padding: 15px; 
+            margin: 15px 0; 
+            border-radius: 8px; 
+            border-left: 4px solid #007cba;
+        }
+        .success { 
+            background: #d4edda; 
+            color: #155724; 
+            border-left-color: #28a745; 
+        }
+        .error { 
+            background: #f8d7da; 
+            color: #721c24; 
+            border-left-color: #dc3545; 
+        }
+        .info { 
+            background: #d1ecf1; 
+            color: #0c5460; 
+            border-left-color: #17a2b8; 
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left-color: #ffc107;
+        }
+        button { 
+            padding: 12px 20px; 
+            margin: 10px 5px; 
+            background: #007cba; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+        button:hover { 
+            background: #005a87; 
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .form-group select[multiple] {
+            min-height: 120px;
+        }
+        .required {
+            color: #dc3545;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-start;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+        #log { 
+            background: #f8f9fa; 
+            padding: 20px; 
+            border: 1px solid #dee2e6; 
+            border-radius: 8px; 
+            max-height: 400px; 
+            overflow-y: auto; 
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-online { background: #28a745; }
+        .status-offline { background: #dc3545; }
+        .status-pending { background: #ffc107; }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007cba, #0056b3);
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+        .step {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #007cba;
+        }
+        .step h4 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 BKM Aksiyon Takip - Aksiyon Ekleme Sistemi Test</h1>
+        
+        <div class="info">
+            <h3>📋 Test Bilgileri:</h3>
+            <p><strong>Amaç:</strong> Frontend'den AJAX ile aksiyon ekleme sistemini test etmek</p>
+            <p><strong>Önemli:</strong> WordPress admin panelinde yönetici olarak giriş yapmış olmanız gerekir</p>
+            <p><strong>Test Edilen Özellikler:</strong></p>
+            <ul>
+                <li>✅ AJAX aksiyon ekleme sistemi</li>
+                <li>✅ Sayfa yenilemesi olmadan yeni aksiyonun tabloda görünmesi</li>
+                <li>✅ Form validasyonu ve hata yönetimi</li>
+                <li>✅ Loading states ve animasyonlar</li>
+                <li>✅ Email bildirim sistemi</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h4>1️⃣ Sistem Durumu Kontrolü</h4>
+            <p>WordPress bağlantısı ve yetki kontrollerini test edelim.</p>
+            <button onclick="checkSystemStatus()">Sistem Durumunu Kontrol Et</button>
+            <div id="system-status"></div>
+        </div>
+
+        <div class="step">
+            <h4>2️⃣ Veritabanı Tablo Kontrolü</h4>
+            <p>Gerekli veritabanı tablolarının varlığını kontrol edelim.</p>
+            <button onclick="checkDatabaseTables()">Tabloları Kontrol Et</button>
+            <div id="database-status"></div>
+        </div>
+
+        <div class="step">
+            <h4>3️⃣ AJAX Aksiyon Ekleme Testi</h4>
+            <p>Gerçek bir aksiyon ekleme senaryosunu test edelim.</p>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="kategori_id">Kategori <span class="required">*</span>:</label>
+                    <select id="kategori_id" required>
+                        <option value="">Seçiniz...</option>
+                        <option value="1">Kalite</option>
+                        <option value="2">Üretim</option>
+                        <option value="3">Satış</option>
+                        <option value="4">İnsan Kaynakları</option>
+                        <option value="5">Bilgi İşlem</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="performans_id">Performans <span class="required">*</span>:</label>
+                    <select id="performans_id" required>
+                        <option value="">Seçiniz...</option>
+                        <option value="1">Düşük</option>
+                        <option value="2">Orta</option>
+                        <option value="3">Yüksek</option>
+                        <option value="4">Kritik</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="sorumlu_ids">Sorumlu Kişiler <span class="required">*</span>:</label>
+                <select id="sorumlu_ids" multiple required>
+                    <option value="1">Admin User</option>
+                    <option value="2">Test User 1</option>
+                    <option value="3">Test User 2</option>
+                </select>
+                <small>Birden fazla seçim için Ctrl tuşunu basılı tutun</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="tespit_konusu">Tespit Konusu <span class="required">*</span>:</label>
+                <textarea id="tespit_konusu" required placeholder="Tespit edilen konuyu kısaca açıklayın...">Test amaçlı tespit konusu - AJAX sistemi test ediliyor</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="aciklama">Açıklama <span class="required">*</span>:</label>
+                <textarea id="aciklama" required placeholder="Aksiyonun detaylı açıklamasını yazın...">Test amaçlı aksiyon açıklaması - AJAX ile ekleme sistemi test ediliyor. Sayfa yenilemesi olmadan yeni aksiyon tabloda görünmelidir.</textarea>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="hedef_tarih">Hedef Tarih <span class="required">*</span>:</label>
+                    <input type="date" id="hedef_tarih" required />
+                </div>
+                
+                <div class="form-group">
+                    <label for="onem_derecesi">Önem Derecesi <span class="required">*</span>:</label>
+                    <select id="onem_derecesi" required>
+                        <option value="">Seçiniz...</option>
+                        <option value="1">Düşük</option>
+                        <option value="2">Orta</option>
+                        <option value="3">Yüksek</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button onclick="testActionAdd()" id="addActionBtn">🚀 AJAX ile Aksiyon Ekle</button>
+                <button onclick="clearForm()">🗑️ Formu Temizle</button>
+            </div>
+        </div>
+
+        <div class="step">
+            <h4>4️⃣ Test Sonuçları</h4>
+            <div id="results"></div>
+        </div>
+
+        <div class="step">
+            <h4>5️⃣ Detaylı Log</h4>
+            <div id="log"></div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Initialize page
+        $(document).ready(function() {
+            log('🎯 Aksiyon Ekleme Test Sayfası Yüklendi');
+            log('📅 Test Tarihi: ' + new Date().toLocaleString('tr-TR'));
+            log('💻 jQuery Versiyonu: ' + jQuery.fn.jquery);
+            
+            // Set default date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            $('#hedef_tarih').val(tomorrow.toISOString().slice(0, 10));
+            
+            showResult('✅ Test sayfası hazır. WordPress admin panelinde yönetici olarak giriş yaptığınızdan emin olun.', 'info');
+        });
+
+        function getWordPressAjaxUrl() {
+            const possibleUrls = [
+                '/wp-admin/admin-ajax.php',
+                '../wp-admin/admin-ajax.php', 
+                '../../wp-admin/admin-ajax.php',
+                '../../../wp-admin/admin-ajax.php'
+            ];
+            return possibleUrls[0];
+        }
+
+        function getNonce() {
+            return 'test_nonce_value';
+        }
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString('tr-TR');
+            const colorMap = {
+                'info': '#495057',
+                'success': '#28a745', 
+                'error': '#dc3545',
+                'warning': '#856404'
+            };
+            
+            const icon = type === 'success' ? '✅' : 
+                        type === 'error' ? '❌' : 
+                        type === 'warning' ? '⚠️' : 'ℹ️';
+            
+            logDiv.innerHTML += `<div style="color: ${colorMap[type] || '#495057'}; margin-bottom: 5px;">
+                ${icon} [${timestamp}] ${message}
+            </div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function showResult(message, type) {
+            const resultsDiv = document.getElementById('results');
+            const className = type === 'error' ? 'error' : 
+                             type === 'success' ? 'success' : 
+                             type === 'warning' ? 'warning' : 'info';
+            resultsDiv.innerHTML += `<div class="test-result ${className}">${message}</div>`;
+        }
+
+        function checkSystemStatus() {
+            log('🔍 Sistem durumu kontrolü başlatılıyor...');
+            
+            $.ajax({
+                url: getWordPressAjaxUrl(),
+                type: 'POST',
+                data: {
+                    action: 'bkm_check_tables',
+                    nonce: getNonce()
+                },
+                success: function(response) {
+                    log('✅ WordPress bağlantısı başarılı', 'success');
+                    showResult('🟢 WordPress AJAX endpoint\'i erişilebilir', 'success');
+                    
+                    $('#system-status').html(`
+                        <div class="test-result success">
+                            <span class="status-indicator status-online"></span>
+                            <strong>WordPress Bağlantısı:</strong> Aktif<br>
+                            <span class="status-indicator status-online"></span>
+                            <strong>AJAX Endpoint:</strong> Erişilebilir<br>
+                            <span class="status-indicator status-online"></span>
+                            <strong>Kullanıcı Durumu:</strong> Giriş yapmış
+                        </div>
+                    `);
+                },
+                error: function(xhr, status, error) {
+                    log('❌ WordPress bağlantısı başarısız: ' + error, 'error');
+                    showResult('🔴 WordPress bağlantısı başarısız - Giriş yapmamış olabilirsiniz', 'error');
+                    
+                    $('#system-status').html(`
+                        <div class="test-result error">
+                            <span class="status-indicator status-offline"></span>
+                            <strong>WordPress Bağlantısı:</strong> Başarısız<br>
+                            <strong>Hata:</strong> ${error}<br>
+                            <strong>HTTP Status:</strong> ${xhr.status}
+                        </div>
+                    `);
+                }
+            });
+        }
+
+        function checkDatabaseTables() {
+            log('🗄️ Veritabanı tablo kontrolü başlatılıyor...');
+            
+            $.ajax({
+                url: getWordPressAjaxUrl(),
+                type: 'POST',
+                data: {
+                    action: 'bkm_check_tables',
+                    nonce: getNonce()
+                },
+                success: function(response) {
+                    log('📊 Tablo kontrolü tamamlandı: ' + JSON.stringify(response), 'success');
+                    
+                    if (response.success) {
+                        const data = response.data;
+                        let tableStatus = '<div class="test-result success"><h4>📋 Veritabanı Tabloları:</h4>';
+                        
+                        Object.keys(data.tables).forEach(tableName => {
+                            const table = data.tables[tableName];
+                            const statusIcon = table.exists ? '✅' : '❌';
+                            const statusClass = table.exists ? 'status-online' : 'status-offline';
+                            
+                            tableStatus += `
+                                <div style="margin: 5px 0;">
+                                    <span class="status-indicator ${statusClass}"></span>
+                                    <strong>${tableName}:</strong> ${table.exists ? 'Mevcut' : 'Eksik'} 
+                                    ${table.exists ? `(${table.count} kayıt)` : ''}
+                                </div>
+                            `;
+                        });
+                        
+                        tableStatus += `<br><strong>Eksik Tablo Sayısı:</strong> ${data.missing_count}</div>`;
+                        $('#database-status').html(tableStatus);
+                        
+                        if (data.missing_count === 0) {
+                            showResult('🟢 Tüm veritabanı tabloları mevcut', 'success');
+                        } else {
+                            showResult(`🟡 ${data.missing_count} tablo eksik - Plugin aktif edildiğinde otomatik oluşturulacak`, 'warning');
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    log('❌ Tablo kontrolü başarısız: ' + error, 'error');
+                    showResult('🔴 Veritabanı tablo kontrolü başarısız', 'error');
+                    
+                    $('#database-status').html(`
+                        <div class="test-result error">
+                            <span class="status-indicator status-offline"></span>
+                            <strong>Tablo Kontrolü:</strong> Başarısız<br>
+                            <strong>Hata:</strong> ${error}
+                        </div>
+                    `);
+                }
+            });
+        }
+
+        function testActionAdd() {
+            // Validate form
+            const requiredFields = ['kategori_id', 'performans_id', 'tespit_konusu', 'aciklama', 'hedef_tarih', 'onem_derecesi'];
+            const sorumluIds = $('#sorumlu_ids').val();
+            
+            let isValid = true;
+            requiredFields.forEach(fieldId => {
+                const field = $('#' + fieldId);
+                if (!field.val()) {
+                    field.css('border-color', '#dc3545');
+                    isValid = false;
+                } else {
+                    field.css('border-color', '#ced4da');
+                }
+            });
+            
+            if (!sorumluIds || sorumluIds.length === 0) {
+                $('#sorumlu_ids').css('border-color', '#dc3545');
+                isValid = false;
+            } else {
+                $('#sorumlu_ids').css('border-color', '#ced4da');
+            }
+            
+            if (!isValid) {
+                showResult('❌ Lütfen tüm zorunlu alanları doldurun!', 'error');
+                log('❌ Form validasyonu başarısız - eksik alanlar var', 'error');
+                return;
+            }
+            
+            log('🚀 AJAX aksiyon ekleme testi başlatılıyor...');
+            log(`📝 Form Verileri:`);
+            log(`   Kategori: ${$('#kategori_id option:selected').text()}`);
+            log(`   Performans: ${$('#performans_id option:selected').text()}`);
+            log(`   Sorumlu Sayısı: ${sorumluIds.length}`);
+            log(`   Önem: ${$('#onem_derecesi option:selected').text()}`);
+            log(`   Hedef Tarih: ${$('#hedef_tarih').val()}`);
+            
+            // Disable button and show loading
+            const btn = $('#addActionBtn');
+            btn.prop('disabled', true).text('⏳ Aksiyon Ekleniyor...');
+            
+            // Create progress bar
+            showResult(`
+                <div style="margin: 15px 0;">
+                    <strong>🔄 Aksiyon Ekleme İşlemi Devam Ediyor...</strong>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 30%"></div>
+                    </div>
+                    <small>AJAX isteği gönderiliyor...</small>
+                </div>
+            `, 'info');
+            
+            $.ajax({
+                url: getWordPressAjaxUrl(),
+                type: 'POST',
+                data: {
+                    action: 'bkm_add_action',
+                    kategori_id: $('#kategori_id').val(),
+                    performans_id: $('#performans_id').val(),
+                    sorumlu_ids: sorumluIds,
+                    tespit_konusu: $('#tespit_konusu').val(),
+                    aciklama: $('#aciklama').val(),
+                    hedef_tarih: $('#hedef_tarih').val(),
+                    onem_derecesi: $('#onem_derecesi').val(),
+                    nonce: getNonce()
+                },
+                success: function(response) {
+                    // Update progress
+                    $('.progress-fill').css('width', '100%');
+                    
+                    log('📡 AJAX isteği tamamlandı: ' + JSON.stringify(response), 'success');
+                    
+                    if (response.success) {
+                        log('✅ Aksiyon başarıyla eklendi!', 'success');
+                        log(`📋 Aksiyon ID: ${response.data.action_id}`);
+                        log(`💌 ${response.data.message}`);
+                        
+                        showResult(`
+                            <div style="margin: 15px 0;">
+                                <strong>🎉 AKSIYON BAŞARIYLA EKLENDİ!</strong><br>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 100%"></div>
+                                </div>
+                                <strong>Aksiyon ID:</strong> ${response.data.action_id}<br>
+                                <strong>Mesaj:</strong> ${response.data.message}<br>
+                                <strong>HTML Oluşturuldu:</strong> ${response.data.action_html ? 'Evet ✅' : 'Hayır ❌'}<br>
+                                <small>🔄 Gerçek uygulamada bu aksiyon sayfa yenilemesi olmadan tabloya eklenecek!</small>
+                            </div>
+                        `, 'success');
+                        
+                        // Show action HTML if available
+                        if (response.data.action_html) {
+                            log('🎨 Aksiyon HTML\'i oluşturuldu', 'success');
+                            showResult(`
+                                <details style="margin-top: 15px;">
+                                    <summary style="cursor: pointer; font-weight: 600;">🔍 Oluşturulan HTML Kodunu Görüntüle</summary>
+                                    <pre style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin: 10px 0; overflow-x: auto; font-size: 12px;">${response.data.action_html.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+                                </details>
+                            `, 'info');
+                        }
+                        
+                        clearForm();
+                    } else {
+                        log('❌ Aksiyon ekleme başarısız: ' + response.data.message, 'error');
+                        showResult('❌ Aksiyon Ekleme Başarısız: ' + response.data.message, 'error');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    log('💥 AJAX hatası: ' + error, 'error');
+                    log('📄 Response: ' + xhr.responseText, 'error');
+                    log('📊 HTTP Status: ' + xhr.status, 'error');
+                    
+                    showResult('💥 AJAX Hatası: ' + error + ' (HTTP ' + xhr.status + ')', 'error');
+                    
+                    if (xhr.status === 0) {
+                        showResult('🌐 Bağlantı problemi - WordPress erişilebilir değil', 'error');
+                    } else if (xhr.status === 403) {
+                        showResult('🔒 Yetki hatası - Admin olarak giriş yapın', 'error');
+                    } else if (xhr.status === 404) {
+                        showResult('📂 Endpoint bulunamadı - Plugin aktif mi?', 'error');
+                    }
+                },
+                complete: function() {
+                    // Re-enable button
+                    btn.prop('disabled', false).text('🚀 AJAX ile Aksiyon Ekle');
+                    log('🏁 Test tamamlandı', 'info');
+                }
+            });
+        }
+
+        function clearForm() {
+            $('#kategori_id, #performans_id, #onem_derecesi').val('');
+            $('#sorumlu_ids').val([]);
+            $('#tespit_konusu, #aciklama').val('');
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            $('#hedef_tarih').val(tomorrow.toISOString().slice(0, 10));
+            
+            // Reset border colors
+            $('input, select, textarea').css('border-color', '#ced4da');
+            
+            log('🧹 Form temizlendi', 'info');
+        }
+    </script>
+</body>
+</html>

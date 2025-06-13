@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BKM Aksiyon Takip - Görev Ekleme Testi</title>
+    <meta charset="UTF-8">
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-result { 
+            padding: 15px; 
+            margin: 15px 0; 
+            border-radius: 8px; 
+            border-left: 4px solid #007cba;
+        }
+        .success { 
+            background: #d4edda; 
+            color: #155724; 
+            border-left-color: #28a745;
+        }
+        .error { 
+            background: #f8d7da; 
+            color: #721c24; 
+            border-left-color: #dc3545;
+        }
+        .warning { 
+            background: #fff3cd; 
+            color: #856404; 
+            border-left-color: #ffc107;
+        }
+        .info { 
+            background: #cce8ff; 
+            color: #004085; 
+            border-left-color: #007cba;
+        }
+        .step {
+            background: #f8f9fa;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        .step h4 {
+            margin-top: 0;
+            color: #2c3e50;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+        button { 
+            background: #007cba; 
+            color: white; 
+            border: none; 
+            padding: 12px 25px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            margin: 5px; 
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        button:hover { 
+            background: #005a87; 
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .required {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-actions {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-online { background: #28a745; }
+        .status-offline { background: #dc3545; }
+        .status-warning { background: #ffc107; }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007cba, #0056b3);
+            transition: width 0.3s ease;
+        }
+        .info {
+            background: #e7f3ff;
+            border: 1px solid #b8daff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        .info h3 {
+            margin-top: 0;
+            color: #004085;
+        }
+        .info ul {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        .info li {
+            margin: 5px 0;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+            border-bottom: 3px solid #007cba;
+            padding-bottom: 15px;
+        }
+        h4 {
+            margin: 0 0 15px 0;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 BKM Aksiyon Takip - Görev Ekleme Sistemi Test</h1>
+        
+        <div class="info">
+            <h3>📋 Test Bilgileri:</h3>
+            <p><strong>Amaç:</strong> Frontend'den AJAX ile görev ekleme sistemini test etmek</p>
+            <p><strong>Önemli:</strong> WordPress admin panelinde yönetici veya editör olarak giriş yapmış olmanız gerekir</p>
+            <p><strong>Test Edilen Özellikler:</strong></p>
+            <ul>
+                <li>✅ AJAX görev ekleme sistemi</li>
+                <li>✅ Form validasyonu ve hata yönetimi</li>
+                <li>✅ Sayfa yenilemesi olmadan tablo güncelleme</li>
+                <li>✅ Email bildirim sistemi</li>
+                <li>✅ Loading states ve animasyonlar</li>
+                <li>✅ Responsive design</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h4>1️⃣ Sistem Durumu Kontrolü</h4>
+            <button onclick="checkSystemStatus()">🔍 Sistem Durumunu Kontrol Et</button>
+            <div id="system-status"></div>
+        </div>
+
+        <div class="step">
+            <h4>2️⃣ Veritabanı Tablo Kontrolü</h4>
+            <button onclick="checkDatabaseTables()">🗄️ Veritabanı Tablolarını Kontrol Et</button>
+            <div id="database-status"></div>
+        </div>        <div class="step">
+            <h4>3️⃣ Test Görev Ekleme Formu</h4>
+            <p><strong>Debug Modunda:</strong> Tarayıcı konsolu (F12) açın ve test ederken console.log mesajlarını takip edin.</p>
+            
+            <div class="form-group">
+                <label for="action_id">Aksiyon <span class="required">*</span>:</label>
+                <select id="action_id" required>
+                    <option value="">Seçiniz...</option>
+                    <option value="1">Test Aksiyon 1 - Sistem Geliştirme</option>
+                    <option value="2">Test Aksiyon 2 - Eğitim Faaliyetleri</option>
+                    <option value="3">Test Aksiyon 3 - Kalite Kontrol</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="task_content">Görev İçeriği <span class="required">*</span>:</label>
+                <textarea id="task_content" required placeholder="Görev açıklamasını yazın...">Test amaçlı görev içeriği - AJAX sistemi test ediliyor. Sayfa yenilemesi olmadan yeni görev ilgili aksiyonun görev listesinde görünmelidir.</textarea>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="baslangic_tarihi">Başlangıç Tarihi <span class="required">*</span>:</label>
+                    <input type="date" id="baslangic_tarihi" required />
+                </div>
+                
+                <div class="form-group">
+                    <label for="hedef_bitis_tarihi">Hedef Bitiş Tarihi <span class="required">*</span>:</label>
+                    <input type="date" id="hedef_bitis_tarihi" required />
+                </div>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="sorumlu_id">Sorumlu <span class="required">*</span>:</label>
+                    <select id="sorumlu_id" required>
+                        <option value="">Seçiniz...</option>
+                        <option value="1">Admin User</option>
+                        <option value="2">Test User 1</option>
+                        <option value="3">Test User 2</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ilerleme_durumu">İlerleme (%):</label>
+                    <input type="number" id="ilerleme_durumu" min="0" max="100" value="0" />
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button onclick="testTaskAdd()" id="addTaskBtn">🚀 AJAX ile Görev Ekle</button>
+                <button onclick="clearForm()">🗑️ Formu Temizle</button>
+            </div>
+        </div>
+
+        <div class="step">
+            <h4>4️⃣ Test Sonuçları</h4>
+            <div id="results"></div>
+        </div>
+
+        <div class="step">
+            <h4>5️⃣ Detaylı Log</h4>
+            <div id="log"></div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Initialize page
+        $(document).ready(function() {
+            log('📄 Görev ekleme test sayfası yüklendi', 'info');
+            
+            // Set default dates
+            const today = new Date();
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const nextWeek = new Date();
+            nextWeek.setDate(nextWeek.getDate() + 7);
+            
+            $('#baslangic_tarihi').val(tomorrow.toISOString().slice(0, 10));
+            $('#hedef_bitis_tarihi').val(nextWeek.toISOString().slice(0, 10));
+            
+            log('📅 Varsayılan tarihler ayarlandı', 'info');
+        });
+
+        function getWordPressAjaxUrl() {
+            // Try to detect WordPress AJAX URL
+            if (typeof ajaxurl !== 'undefined') {
+                return ajaxurl;
+            }
+            
+            // Fallback: try common WordPress AJAX URL patterns
+            const possibleUrls = [
+                '/wp-admin/admin-ajax.php',
+                window.location.origin + '/wp-admin/admin-ajax.php',
+                window.location.protocol + '//' + window.location.host + '/wp-admin/admin-ajax.php'
+            ];
+            
+            return possibleUrls[1]; // Use the most common pattern
+        }
+
+        function getNonce() {
+            // Try to get nonce from WordPress
+            if (typeof bkmFrontend !== 'undefined' && bkmFrontend.nonce) {
+                return bkmFrontend.nonce;
+            }
+            
+            // Fallback: return empty string (test will show this issue)
+            return '';
+        }
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logDiv = $('#log');
+            const typeClass = type || 'info';
+            
+            logDiv.append(`
+                <div class="test-result ${typeClass}">
+                    <strong>[${timestamp}]</strong> ${message}
+                </div>
+            `);
+            
+            // Auto-scroll to bottom
+            logDiv.scrollTop(logDiv[0].scrollHeight);
+            
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        function showResult(message, type = 'info') {
+            $('#results').html(`
+                <div class="test-result ${type}">
+                    ${message}
+                </div>
+            `);
+        }
+
+        function checkSystemStatus() {
+            log('🔍 Sistem durumu kontrol ediliyor...');
+            
+            const checks = [
+                { name: 'jQuery', status: typeof $ !== 'undefined' },
+                { name: 'WordPress AJAX URL', status: getWordPressAjaxUrl() !== '' },
+                { name: 'BKM Frontend Object', status: typeof bkmFrontend !== 'undefined' },
+                { name: 'Nonce Token', status: getNonce() !== '' }
+            ];
+            
+            let allGood = true;
+            let statusHtml = '<div style="margin-top: 15px;">';
+            
+            checks.forEach(check => {
+                const icon = check.status ? '✅' : '❌';
+                const statusText = check.status ? 'OK' : 'HATA';
+                const statusClass = check.status ? 'status-online' : 'status-offline';
+                
+                statusHtml += `
+                    <div class="test-result ${check.status ? 'success' : 'error'}">
+                        <span class="status-indicator ${statusClass}"></span>
+                        <strong>${check.name}:</strong> ${statusText} ${icon}
+                    </div>
+                `;
+                
+                if (!check.status) allGood = false;
+                log(`${icon} ${check.name}: ${statusText}`);
+            });
+            
+            statusHtml += '</div>';
+            
+            if (allGood) {
+                showResult('🟢 Tüm sistem kontrolleri başarılı! Test devam edebilir.', 'success');
+                log('✅ Sistem durumu kontrolü başarılı', 'success');
+            } else {
+                showResult('🔴 Bazı sistem kontrolleri başarısız! Lütfen WordPress admin paneline giriş yapın.', 'error');
+                log('❌ Sistem durumu kontrolünde problemler var', 'error');
+            }
+            
+            $('#system-status').html(statusHtml);
+        }
+
+        function checkDatabaseTables() {
+            log('🗄️ Veritabanı tabloları kontrol ediliyor...');
+            
+            $.ajax({
+                url: getWordPressAjaxUrl(),
+                type: 'POST',
+                data: {
+                    action: 'bkm_check_tables',
+                    nonce: getNonce()
+                },
+                success: function(response) {
+                    log('📊 Tablo kontrolü tamamlandı: ' + JSON.stringify(response), 'info');
+                    
+                    if (response.success) {
+                        const data = response.data;
+                        const requiredTables = ['bkm_actions', 'bkm_tasks', 'bkm_task_notes', 'bkm_categories', 'bkm_performance'];
+                        let tableStatusHtml = '<div style="margin-top: 15px;">';
+                        
+                        requiredTables.forEach(table => {
+                            const exists = data.tables[table];
+                            const icon = exists ? '✅' : '❌';
+                            const statusClass = exists ? 'status-online' : 'status-offline';
+                            
+                            tableStatusHtml += `
+                                <div class="test-result ${exists ? 'success' : 'error'}">
+                                    <span class="status-indicator ${statusClass}"></span>
+                                    <strong>${table}:</strong> ${exists ? 'Mevcut' : 'Eksik'} ${icon}
+                                </div>
+                            `;
+                        });
+                        
+                        tableStatusHtml += '</div>';
+                        $('#database-status').html(tableStatusHtml);
+                        
+                        if (data.missing_count === 0) {
+                            showResult('🟢 Tüm veritabanı tabloları mevcut', 'success');
+                        } else {
+                            showResult(`🟡 ${data.missing_count} tablo eksik - Plugin aktif edildiğinde otomatik oluşturulacak`, 'warning');
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    log('❌ Tablo kontrolü başarısız: ' + error, 'error');
+                    showResult('🔴 Veritabanı tablo kontrolü başarısız', 'error');
+                    
+                    $('#database-status').html(`
+                        <div class="test-result error">
+                            <span class="status-indicator status-offline"></span>
+                            <strong>Tablo Kontrolü:</strong> Başarısız<br>
+                            <strong>Hata:</strong> ${error}
+                        </div>
+                    `);
+                }
+            });
+        }
+
+        function testTaskAdd() {
+            // Validate form
+            const requiredFields = ['action_id', 'task_content', 'baslangic_tarihi', 'sorumlu_id', 'hedef_bitis_tarihi'];
+            
+            let isValid = true;
+            requiredFields.forEach(fieldId => {
+                const field = $('#' + fieldId);
+                if (!field.val()) {
+                    field.css('border-color', '#dc3545');
+                    isValid = false;
+                } else {
+                    field.css('border-color', '#ced4da');
+                }
+            });
+            
+            if (!isValid) {
+                showResult('❌ Lütfen tüm zorunlu alanları doldurun!', 'error');
+                log('❌ Form validasyonu başarısız - eksik alanlar var', 'error');
+                return;
+            }
+            
+            log('🚀 AJAX görev ekleme testi başlatılıyor...');
+            log(`📝 Form Verileri:`);
+            log(`   Aksiyon: ${$('#action_id option:selected').text()}`);
+            log(`   İçerik: ${$('#task_content').val().substring(0, 50)}...`);
+            log(`   Sorumlu: ${$('#sorumlu_id option:selected').text()}`);
+            log(`   Başlangıç: ${$('#baslangic_tarihi').val()}`);
+            log(`   Hedef: ${$('#hedef_bitis_tarihi').val()}`);
+            log(`   İlerleme: ${$('#ilerleme_durumu').val()}%`);
+            
+            // Disable button and show loading
+            const btn = $('#addTaskBtn');
+            btn.prop('disabled', true).text('⏳ Görev Ekleniyor...');
+            
+            // Create progress bar
+            showResult(`
+                <div style="margin: 15px 0;">
+                    <strong>🔄 Görev Ekleme İşlemi Devam Ediyor...</strong>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 30%"></div>
+                    </div>
+                    <small>AJAX isteği gönderiliyor...</small>
+                </div>
+            `, 'info');
+            
+            $.ajax({
+                url: getWordPressAjaxUrl(),
+                type: 'POST',
+                data: {
+                    action: 'bkm_add_task',
+                    action_id: $('#action_id').val(),
+                    task_content: $('#task_content').val(),
+                    baslangic_tarihi: $('#baslangic_tarihi').val(),
+                    sorumlu_id: $('#sorumlu_id').val(),
+                    hedef_bitis_tarihi: $('#hedef_bitis_tarihi').val(),
+                    ilerleme_durumu: $('#ilerleme_durumu').val(),
+                    nonce: getNonce()
+                },
+                success: function(response) {
+                    // Update progress
+                    showResult(`
+                        <div style="margin: 15px 0;">
+                            <strong>✅ AJAX İsteği Tamamlandı</strong>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    `, 'info');
+                    
+                    log('📨 Sunucu yanıtı alındı: ' + JSON.stringify(response), 'success');
+                    
+                    if (response.success) {
+                        log('✅ Görev ekleme başarılı: ' + response.data.message, 'success');
+                        showResult(`
+                            ✅ <strong>Görev Başarıyla Eklendi!</strong><br>
+                            📝 Mesaj: ${response.data.message}<br>
+                            🆔 Görev ID: ${response.data.task_id}<br>
+                            🎯 Aksiyon ID: ${response.data.action_id}
+                            
+                            ${response.data.task_html ? `
+                                <details style="margin-top: 15px;">
+                                    <summary style="cursor: pointer; font-weight: 600;">🔍 Oluşturulan HTML Kodunu Görüntüle</summary>
+                                    <pre style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin: 10px 0; overflow-x: auto; font-size: 12px;">${response.data.task_html.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+                                </details>
+                            ` : ''}
+                        `, 'success');
+                        
+                        if (response.data.task_html) {
+                            log(`📋 HTML çıktısı oluşturuldu (${response.data.task_html.length} karakter)`, 'info');
+                        }
+                        
+                        clearForm();
+                    } else {
+                        log('❌ Görev ekleme başarısız: ' + response.data.message, 'error');
+                        showResult('❌ Görev Ekleme Başarısız: ' + response.data.message, 'error');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    log('💥 AJAX hatası: ' + error, 'error');
+                    log('📊 Status: ' + status + ', Response: ' + xhr.responseText, 'error');
+                    showResult('💥 AJAX Hatası: ' + error, 'error');
+                },
+                complete: function() {
+                    // Re-enable button
+                    btn.prop('disabled', false).text('🚀 AJAX ile Görev Ekle');
+                    log('🏁 Test tamamlandı', 'info');
+                }
+            });
+        }
+
+        function clearForm() {
+            $('#action_id, #sorumlu_id').val('');
+            $('#task_content').val('');
+            $('#ilerleme_durumu').val(0);
+            
+            // Reset dates
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const nextWeek = new Date();
+            nextWeek.setDate(nextWeek.getDate() + 7);
+            
+            $('#baslangic_tarihi').val(tomorrow.toISOString().slice(0, 10));
+            $('#hedef_bitis_tarihi').val(nextWeek.toISOString().slice(0, 10));
+            
+            // Reset border colors
+            $('input, select, textarea').css('border-color', '#ced4da');
+            
+            log('🧹 Form temizlendi', 'info');
+        }
+    </script>
+</body>
+</html>
